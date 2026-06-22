@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lexicanum Test</title>
+    <style>
+      body { background:#0a0700; color:#ffc444; font-family:monospace; padding:20px; font-size:16px; }
+      .ok { color:#5cff5c; }
+      .fail { color:#ff5555; }
+      #app { margin-top:20px; padding:16px; border:1px solid #ffc444; }
+    </style>
+  </head>
+  <body>
+    <h2>Lexicanum — Diagnose</h2>
+    <div id="log"></div>
+    <div id="app">Hier sollte gleich grüner Text erscheinen...</div>
+
+    <script>
+      var log = document.getElementById("log");
+      function line(txt, ok) {
+        var d = document.createElement("div");
+        d.className = ok ? "ok" : "fail";
+        d.textContent = (ok ? "✓ " : "✗ ") + txt;
+        log.appendChild(d);
+      }
+      // Catch any error and show it on screen
+      window.onerror = function (msg, src, l, c) {
+        line("FEHLER: " + msg + " (Zeile " + l + ")", false);
+        return false;
+      };
+    </script>
+
+    <!-- Load the same CDNs as the real app -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"
+      onload="line('React geladen', true)"
+      onerror="line('React konnte NICHT geladen werden', false)"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+      onload="line('ReactDOM geladen', true)"
+      onerror="line('ReactDOM konnte NICHT geladen werden', false)"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"
+      onload="line('Babel geladen', true)"
+      onerror="line('Babel konnte NICHT geladen werden', false)"></script>
+
+    <script type="text/babel" data-presets="react">
+      const { useState } = React;
+      function Test() {
+        const [n, setN] = useState(0);
+        return (
+          <div style={{ color: "#5cff5c" }}>
+            <p>React funktioniert! JSX wird übersetzt.</p>
+            <button onClick={() => setN(n + 1)} style={{ padding: "8px 16px", fontSize: "16px" }}>
+              Geklickt: {n}
+            </button>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("app")).render(<Test />);
+      line("App gerendert", true);
+    </script>
+  </body>
+</html>
