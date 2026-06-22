@@ -46,12 +46,15 @@
                    text-shadow:0 0 12px var(--glow); }
       .detail p { font-family:'Source Serif 4',serif; font-size:14px; line-height:1.8; margin-bottom:12px; }
       .src { font-size:11px; color:var(--primary); margin-top:16px; display:inline-block; }
+      .src-badge { font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:1px;
+                   background:var(--border); color:var(--bg); padding:1px 5px; margin-left:4px;
+                   vertical-align:middle; }
     </style>
   </head>
   <body>
     <div class="wrap">
       <h1>⚔ KATEGORIE-DEMO</h1>
-      <div class="sub">Imperiale Charaktere — vollständige Liste aus dem Warhammer 40k Wiki</div>
+      <div class="sub">Imperiale Charaktere — beide Wikis kombiniert (Fandom + Lexicanum)</div>
 
       <div class="controls">
         <input class="filter" id="filter" placeholder="Namen filtern…" />
@@ -63,57 +66,89 @@
     </div>
 
     <script>
-      var API = "https://warhammer40k.fandom.com/api.php";
-      var CATEGORY = "Category:Imperial Characters";
-      var allNames = [];
+      // Two community wikis, each with its own category name for the same topic.
+      var WIKIS = [
+        {
+          id: "fandom", label: "Fandom",
+          api: "https://warhammer40k.fandom.com/api.php",
+          base: "https://warhammer40k.fandom.com/wiki/",
+          category: "Category:Imperial Characters"
+        },
+        {
+          id: "lexicanum", label: "Lexicanum",
+          api: "https://wh40k.lexicanum.com/mediawiki/api.php",
+          base: "https://wh40k.lexicanum.com/wiki/",
+          category: "Category:Characters (Imperial)"
+        }
+      ];
 
-      function apiUrl(params) {
+      // name (lowercase) -> { title, sources:[wiki,...] }
+      var entriesByKey = {};
+
+      function apiUrl(api, params) {
         params.format = "json"; params.origin = "*";
-        return API + "?" + Object.keys(params).map(function(k){
+        return api + "?" + Object.keys(params).map(function(k){
           return encodeURIComponent(k) + "=" + encodeURIComponent(params[k]);
         }).join("&");
       }
 
-      // Load ALL members of the category, following cmcontinue.
-      function loadAll(cont) {
+      // Load all members of one wiki's category (following cmcontinue).
+      function loadWiki(wiki, cont) {
         var p = { action:"query", list:"categorymembers",
-                  cmtitle:CATEGORY, cmlimit:"500", cmtype:"page" };
+                  cmtitle:wiki.category, cmlimit:"500", cmtype:"page" };
         if (cont) p.cmcontinue = cont;
-        return fetch(apiUrl(p)).then(function(r){ return r.json(); }).then(function(d){
+        return fetch(apiUrl(wiki.api, p)).then(function(r){ return r.json(); }).then(function(d){
           var members = (d.query && d.query.categorymembers) || [];
-          members.forEach(function(m){ allNames.push(m.title); });
+          members.forEach(function(m){
+            var key = m.title.toLowerCase();
+            if (!entriesByKey[key]) entriesByKey[key] = { title:m.title, sources:[] };
+            if (entriesByKey[key].sources.indexOf(wiki) === -1) entriesByKey[key].sources.push(wiki);
+          });
+          document.getElementById("count").textContent =
+            Object.keys(entriesByKey).length + " geladen…";
           if (d.continue && d.continue.cmcontinue) {
-            document.getElementById("count").textContent =
-              allNames.length + " geladen…";
-            return loadAll(d.continue.cmcontinue);
+            return loadWiki(wiki, d.continue.cmcontinue);
           }
+        }).catch(function(e){
+          // One wiki failing (e.g. Lexicanum bot block) must not kill the other.
+          console.warn(wiki.label + " nicht erreichbar:", e.message);
         });
+      }
+
+      function loadAll() {
+        return Promise.all(WIKIS.map(function(w){ return loadWiki(w); }));
       }
 
       function render(filterText) {
         var list = document.getElementById("list");
-        var names = allNames.slice().sort();
+        var all = Object.keys(entriesByKey).map(function(k){ return entriesByKey[k]; });
+        all.sort(function(a,b){ return a.title.localeCompare(b.title); });
+
+        var entries = all;
         if (filterText) {
           var f = filterText.toLowerCase();
-          names = names.filter(function(n){ return n.toLowerCase().indexOf(f) !== -1; });
+          entries = all.filter(function(e){ return e.title.toLowerCase().indexOf(f) !== -1; });
         }
         document.getElementById("count").textContent =
-          names.length + " von " + allNames.length + " Einträgen";
+          entries.length + " von " + all.length + " Einträgen";
 
         // group by first letter
         var groups = {};
-        names.forEach(function(n){
-          var L = n.charAt(0).toUpperCase();
+        entries.forEach(function(e){
+          var L = e.title.charAt(0).toUpperCase();
           if (!/[A-Z]/.test(L)) L = "#";
-          (groups[L] = groups[L] || []).push(n);
+          (groups[L] = groups[L] || []).push(e);
         });
 
         var html = "";
         Object.keys(groups).sort().forEach(function(L){
           html += '<div class="group-head" id="g-'+L+'">'+L+'</div>';
-          groups[L].forEach(function(n){
-            html += '<div class="entry" data-name="'+encodeURIComponent(n)+'">'+
-                    '<div class="entry-name">'+n+'</div></div>';
+          groups[L].forEach(function(e){
+            var badges = e.sources.map(function(s){
+              return '<span class="src-badge">'+(s.id==="lexicanum"?"LEX":"FAN")+'</span>';
+            }).join("");
+            html += '<div class="entry" data-name="'+encodeURIComponent(e.title)+'">'+
+                    '<div class="entry-name">'+e.title+' '+badges+'</div></div>';
           });
         });
         list.innerHTML = html || '<div class="loading">Keine Treffer</div>';
@@ -127,12 +162,15 @@
         // click handlers
         Array.prototype.forEach.call(list.querySelectorAll(".entry"), function(el){
           el.addEventListener("click", function(){
-            openDetail(decodeURIComponent(el.getAttribute("data-name")));
+            var title = decodeURIComponent(el.getAttribute("data-name"));
+            openDetail(entriesByKey[title.toLowerCase()] || { title:title, sources:WIKIS });
           });
         });
       }
 
-      function openDetail(title) {
+      function openDetail(entry) {
+        var title = entry.title;
+        var sources = entry.sources && entry.sources.length ? entry.sources : WIKIS;
         var d = document.createElement("div");
         d.className = "detail";
         d.innerHTML = '<button class="detail-close">◄ Zurück</button>'+
@@ -140,24 +178,44 @@
         document.body.appendChild(d);
         d.querySelector(".detail-close").addEventListener("click", function(){ d.remove(); });
 
-        var p = { action:"query", prop:"extracts", titles:title,
-                  exintro:"1", explaintext:"1", redirects:"1" };
-        fetch(apiUrl(p)).then(function(r){ return r.json(); }).then(function(data){
-          var pages = data.query.pages;
-          var page = pages[Object.keys(pages)[0]];
-          var extract = (page && page.extract) || "Kein Textauszug verfügbar.";
-          var paras = extract.split("\n").filter(function(s){ return s.trim(); });
-          var body = paras.map(function(t){ return "<p>"+t+"</p>"; }).join("");
-          var url = "https://warhammer40k.fandom.com/wiki/" + encodeURIComponent(title.replace(/ /g,"_"));
+        // Try each source wiki in turn until one returns usable text.
+        var i = 0;
+        function tryNext() {
+          if (i >= sources.length) {
+            showResult("<p style='color:#ff5555'>Kein Textauszug aus den Archiven verfügbar.</p>", null);
+            return;
+          }
+          var wiki = sources[i++];
+          var p = { action:"parse", page:title, prop:"text", redirects:"1" };
+          fetch(apiUrl(wiki.api, p)).then(function(r){ return r.json(); }).then(function(data){
+            if (data.error) throw new Error(data.error.info || "Nicht gefunden");
+            var rawHtml = (data.parse && data.parse.text && data.parse.text["*"]) || "";
+            var doc = new DOMParser().parseFromString(rawHtml, "text/html");
+            var content = doc.querySelector(".mw-parser-output") || doc.body;
+            content.querySelectorAll(".toc,.mw-editsection,.reference,.navbox,.noprint,style,table,sup").forEach(function(el){ el.remove(); });
+            var paras = [];
+            content.querySelectorAll("p").forEach(function(pp){
+              var t = pp.textContent.trim();
+              if (t.length > 20) paras.push(t);
+            });
+            paras = paras.slice(0, 6);
+            if (!paras.length) throw new Error("leer");
+            var body = paras.map(function(t){ return "<p>"+t+"</p>"; }).join("");
+            var url = wiki.base + encodeURIComponent(title.replace(/ /g,"_"));
+            showResult(body, { label: wiki.label, url: url });
+          }).catch(function(){ tryNext(); });
+        }
+
+        function showResult(body, src) {
+          var srcLink = src
+            ? '<a class="src" href="'+src.url+'" target="_blank" rel="noopener">◈ Quelle: '+src.label+' ↗</a>'
+            : '';
           d.innerHTML = '<button class="detail-close">◄ Zurück</button>'+
-                        '<h2>'+title+'</h2>'+body+
-                        '<a class="src" href="'+url+'" target="_blank" rel="noopener">◈ Quelle: Warhammer 40k Wiki ↗</a>';
+                        '<h2>'+title+'</h2>'+body+srcLink;
           d.querySelector(".detail-close").addEventListener("click", function(){ d.remove(); });
-        }).catch(function(e){
-          d.innerHTML = '<button class="detail-close">◄ Zurück</button>'+
-                        '<h2>'+title+'</h2><p style="color:#ff5555">Fehler beim Laden: '+e.message+'</p>';
-          d.querySelector(".detail-close").addEventListener("click", function(){ d.remove(); });
-        });
+        }
+
+        tryNext();
       }
 
       document.getElementById("filter").addEventListener("input", function(e){
