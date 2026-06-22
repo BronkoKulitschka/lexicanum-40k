@@ -29,6 +29,8 @@
       .letter:hover { background:var(--glow); color:var(--accent); }
       .group-head { font-family:'Cinzel',serif; font-size:14px; color:var(--accent);
                     border-bottom:1px solid var(--border); padding:14px 0 4px; margin-top:10px; letter-spacing:2px; }
+      .group-head.important { color:var(--bg); background:var(--primary); padding:8px 12px;
+                              border:none; text-shadow:none; }
       .entry { display:block; padding:11px 12px; border:1px solid rgba(168,106,0,0.25);
                margin-top:6px; cursor:pointer; transition:all 0.12s; background:var(--surface); }
       .entry:hover { border-color:var(--primary); background:rgba(255,176,0,0.08); }
@@ -54,7 +56,7 @@
   <body>
     <div class="wrap">
       <h1>⚔ KATEGORIE-DEMO</h1>
-      <div class="sub">Imperiale Charaktere — beide Wikis kombiniert (Fandom + Lexicanum)</div>
+      <div class="sub">Imperiale Charaktere — Lexicanum (Grundlage) + Fandom, Wichtige oben</div>
 
       <div class="controls">
         <input class="filter" id="filter" placeholder="Namen filtern…" />
@@ -66,38 +68,54 @@
     </div>
 
     <script>
-      // Two community wikis, each with its own category name for the same topic.
+      // A CORS proxy lets the browser reach Lexicanum, which otherwise blocks
+      // direct cross-origin requests. Fandom needs no proxy.
+      // NOTE: public proxies can be slow/unstable; for a real app, host your own.
+      var CORS_PROXY = "https://corsproxy.io/?url=";
+
+      // Curated "important" names shown in a pinned section at the top.
+      var IMPORTANT = [
+        "Roboute Guilliman", "The Emperor of Mankind", "Marneus Calgar",
+        "Sanguinius", "Rogal Dorn", "Leman Russ", "Lion El'Jonson",
+        "Vulkan", "Jaghatai Khan", "Ferrus Manus", "Corvus Corax",
+        "Saint Celestine", "Belisarius Cawl", "Sebastian Yarrick",
+        "Commissar Cain", "Gabriel Angelos", "Kaldor Draigo"
+      ];
+      var importantSet = {};
+      IMPORTANT.forEach(function(n){ importantSet[n.toLowerCase()] = true; });
+
+      // Two community wikis. Lexicanum is the primary source.
       var WIKIS = [
         {
-          id: "fandom", label: "Fandom",
-          api: "https://warhammer40k.fandom.com/api.php",
-          base: "https://warhammer40k.fandom.com/wiki/",
-          category: "Category:Imperial Characters"
-        },
-        {
-          id: "lexicanum", label: "Lexicanum",
+          id: "lexicanum", label: "Lexicanum", proxy: true,
           api: "https://wh40k.lexicanum.com/mediawiki/api.php",
           base: "https://wh40k.lexicanum.com/wiki/",
           category: "Category:Characters (Imperial)"
+        },
+        {
+          id: "fandom", label: "Fandom", proxy: false,
+          api: "https://warhammer40k.fandom.com/api.php",
+          base: "https://warhammer40k.fandom.com/wiki/",
+          category: "Category:Imperial Characters"
         }
       ];
 
-      // name (lowercase) -> { title, sources:[wiki,...] }
       var entriesByKey = {};
 
-      function apiUrl(api, params) {
+      function apiUrl(wiki, params) {
         params.format = "json"; params.origin = "*";
-        return api + "?" + Object.keys(params).map(function(k){
+        var qs = Object.keys(params).map(function(k){
           return encodeURIComponent(k) + "=" + encodeURIComponent(params[k]);
         }).join("&");
+        var full = wiki.api + "?" + qs;
+        return wiki.proxy ? (CORS_PROXY + encodeURIComponent(full)) : full;
       }
 
-      // Load all members of one wiki's category (following cmcontinue).
       function loadWiki(wiki, cont) {
         var p = { action:"query", list:"categorymembers",
                   cmtitle:wiki.category, cmlimit:"500", cmtype:"page" };
         if (cont) p.cmcontinue = cont;
-        return fetch(apiUrl(wiki.api, p)).then(function(r){ return r.json(); }).then(function(d){
+        return fetch(apiUrl(wiki, p)).then(function(r){ return r.json(); }).then(function(d){
           var members = (d.query && d.query.categorymembers) || [];
           members.forEach(function(m){
             var key = m.title.toLowerCase();
@@ -106,11 +124,8 @@
           });
           document.getElementById("count").textContent =
             Object.keys(entriesByKey).length + " geladen…";
-          if (d.continue && d.continue.cmcontinue) {
-            return loadWiki(wiki, d.continue.cmcontinue);
-          }
+          if (d.continue && d.continue.cmcontinue) return loadWiki(wiki, d.continue.cmcontinue);
         }).catch(function(e){
-          // One wiki failing (e.g. Lexicanum bot block) must not kill the other.
           console.warn(wiki.label + " nicht erreichbar:", e.message);
         });
       }
@@ -132,34 +147,48 @@
         document.getElementById("count").textContent =
           entries.length + " von " + all.length + " Einträgen";
 
-        // group by first letter
+        function badges(e){
+          return e.sources.map(function(s){
+            return '<span class="src-badge">'+(s.id==="lexicanum"?"LEX":"FAN")+'</span>';
+          }).join("");
+        }
+        function entryHtml(e){
+          return '<div class="entry" data-name="'+encodeURIComponent(e.title)+'">'+
+                 '<div class="entry-name">'+e.title+' '+badges(e)+'</div></div>';
+        }
+
+        var html = "";
+
+        // Pinned "important" section (only when not filtering).
+        if (!filterText) {
+          var important = entries.filter(function(e){ return importantSet[e.title.toLowerCase()]; });
+          if (important.length) {
+            html += '<div class="group-head important" id="g-star">★ WICHTIGE</div>';
+            important.forEach(function(e){ html += entryHtml(e); });
+          }
+        }
+
+        // Full alphabetical list.
         var groups = {};
         entries.forEach(function(e){
           var L = e.title.charAt(0).toUpperCase();
           if (!/[A-Z]/.test(L)) L = "#";
           (groups[L] = groups[L] || []).push(e);
         });
-
-        var html = "";
         Object.keys(groups).sort().forEach(function(L){
           html += '<div class="group-head" id="g-'+L+'">'+L+'</div>';
-          groups[L].forEach(function(e){
-            var badges = e.sources.map(function(s){
-              return '<span class="src-badge">'+(s.id==="lexicanum"?"LEX":"FAN")+'</span>';
-            }).join("");
-            html += '<div class="entry" data-name="'+encodeURIComponent(e.title)+'">'+
-                    '<div class="entry-name">'+e.title+' '+badges+'</div></div>';
-          });
+          groups[L].forEach(function(e){ html += entryHtml(e); });
         });
+
         list.innerHTML = html || '<div class="loading">Keine Treffer</div>';
 
-        // letter nav
         var lt = document.getElementById("letters");
-        lt.innerHTML = Object.keys(groups).sort().map(function(L){
-          return '<a class="letter" href="#g-'+L+'">'+L+'</a>';
-        }).join("");
+        var letterLinks = (!filterText && Object.keys(importantSet).length ? ['<a class="letter" href="#g-star">★</a>'] : [])
+          .concat(Object.keys(groups).sort().map(function(L){
+            return '<a class="letter" href="#g-'+L+'">'+L+'</a>';
+          }));
+        lt.innerHTML = letterLinks.join("");
 
-        // click handlers
         Array.prototype.forEach.call(list.querySelectorAll(".entry"), function(el){
           el.addEventListener("click", function(){
             var title = decodeURIComponent(el.getAttribute("data-name"));
@@ -187,7 +216,7 @@
           }
           var wiki = sources[i++];
           var p = { action:"parse", page:title, prop:"text", redirects:"1" };
-          fetch(apiUrl(wiki.api, p)).then(function(r){ return r.json(); }).then(function(data){
+          fetch(apiUrl(wiki, p)).then(function(r){ return r.json(); }).then(function(data){
             if (data.error) throw new Error(data.error.info || "Nicht gefunden");
             var rawHtml = (data.parse && data.parse.text && data.parse.text["*"]) || "";
             var doc = new DOMParser().parseFromString(rawHtml, "text/html");
