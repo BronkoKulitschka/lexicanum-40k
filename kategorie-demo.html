@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0700" />
+    <title>Lexicanum — Kategorie-Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Share+Tech+Mono&family=Source+Serif+4:ital,wght@0,400&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg:#0a0700; --surface:#140e02; --primary:#ffb000; --accent:#ffcc33;
+        --text:#ffc444; --border:#a86a00; --glow:rgba(255,176,0,0.4);
+      }
+      * { box-sizing:border-box; margin:0; padding:0; }
+      html,body { background:var(--bg); color:var(--text); font-family:'Share Tech Mono',monospace; }
+      .wrap { max-width:900px; margin:0 auto; padding:16px; }
+      h1 { font-family:'Cinzel',serif; font-size:18px; letter-spacing:2px; color:var(--primary);
+           text-shadow:0 0 12px var(--glow); margin-bottom:4px; }
+      .sub { font-size:11px; color:var(--text); opacity:0.7; margin-bottom:16px; letter-spacing:1px; }
+      .controls { position:sticky; top:0; background:var(--bg); padding:8px 0 10px; z-index:10;
+                  border-bottom:1px solid var(--border); }
+      .filter { width:100%; padding:12px 14px; background:var(--surface); border:1px solid var(--border);
+                color:var(--text); font-family:'Share Tech Mono',monospace; font-size:15px; outline:none; }
+      .filter:focus { border-color:var(--primary); box-shadow:0 0 0 2px var(--glow); }
+      .count { font-size:11px; color:var(--accent); margin-top:8px; letter-spacing:1px; }
+      .letters { display:flex; flex-wrap:wrap; gap:3px; margin-top:8px; }
+      .letter { padding:3px 7px; background:var(--surface); border:1px solid var(--border);
+                color:var(--text); font-size:11px; cursor:pointer; text-decoration:none; }
+      .letter:hover { background:var(--glow); color:var(--accent); }
+      .group-head { font-family:'Cinzel',serif; font-size:14px; color:var(--accent);
+                    border-bottom:1px solid var(--border); padding:14px 0 4px; margin-top:10px; letter-spacing:2px; }
+      .entry { display:block; padding:11px 12px; border:1px solid rgba(168,106,0,0.25);
+               margin-top:6px; cursor:pointer; transition:all 0.12s; background:var(--surface); }
+      .entry:hover { border-color:var(--primary); background:rgba(255,176,0,0.08); }
+      .entry-name { font-family:'Cinzel',serif; font-size:14px; color:var(--text); }
+      .entry-desc { font-family:'Source Serif 4',serif; font-size:12px; color:var(--text);
+                    opacity:0.75; line-height:1.5; margin-top:4px; }
+      .loading { padding:40px; text-align:center; color:var(--primary); letter-spacing:2px;
+                 animation:blink 1.2s step-end infinite; }
+      @keyframes blink { 50% { opacity:0.3; } }
+      .detail { position:fixed; inset:0; background:var(--bg); z-index:50; overflow-y:auto; padding:16px; }
+      .detail-close { font-family:'Cinzel',serif; font-size:11px; letter-spacing:2px; color:var(--primary);
+                      border:1px solid var(--border); padding:8px 16px; background:transparent;
+                      cursor:pointer; margin-bottom:14px; }
+      .detail h2 { font-family:'Cinzel',serif; color:var(--accent); font-size:20px; margin-bottom:12px;
+                   text-shadow:0 0 12px var(--glow); }
+      .detail p { font-family:'Source Serif 4',serif; font-size:14px; line-height:1.8; margin-bottom:12px; }
+      .src { font-size:11px; color:var(--primary); margin-top:16px; display:inline-block; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>⚔ KATEGORIE-DEMO</h1>
+      <div class="sub">Imperiale Charaktere — vollständige Liste aus dem Warhammer 40k Wiki</div>
+
+      <div class="controls">
+        <input class="filter" id="filter" placeholder="Namen filtern…" />
+        <div class="count" id="count">Lade Archiv…</div>
+        <div class="letters" id="letters"></div>
+      </div>
+
+      <div id="list"><div class="loading">▓ ARCHIV WIRD GELADEN ▓</div></div>
+    </div>
+
+    <script>
+      var API = "https://warhammer40k.fandom.com/api.php";
+      var CATEGORY = "Category:Imperial Characters";
+      var allNames = [];
+
+      function apiUrl(params) {
+        params.format = "json"; params.origin = "*";
+        return API + "?" + Object.keys(params).map(function(k){
+          return encodeURIComponent(k) + "=" + encodeURIComponent(params[k]);
+        }).join("&");
+      }
+
+      // Load ALL members of the category, following cmcontinue.
+      function loadAll(cont) {
+        var p = { action:"query", list:"categorymembers",
+                  cmtitle:CATEGORY, cmlimit:"500", cmtype:"page" };
+        if (cont) p.cmcontinue = cont;
+        return fetch(apiUrl(p)).then(function(r){ return r.json(); }).then(function(d){
+          var members = (d.query && d.query.categorymembers) || [];
+          members.forEach(function(m){ allNames.push(m.title); });
+          if (d.continue && d.continue.cmcontinue) {
+            document.getElementById("count").textContent =
+              allNames.length + " geladen…";
+            return loadAll(d.continue.cmcontinue);
+          }
+        });
+      }
+
+      function render(filterText) {
+        var list = document.getElementById("list");
+        var names = allNames.slice().sort();
+        if (filterText) {
+          var f = filterText.toLowerCase();
+          names = names.filter(function(n){ return n.toLowerCase().indexOf(f) !== -1; });
+        }
+        document.getElementById("count").textContent =
+          names.length + " von " + allNames.length + " Einträgen";
+
+        // group by first letter
+        var groups = {};
+        names.forEach(function(n){
+          var L = n.charAt(0).toUpperCase();
+          if (!/[A-Z]/.test(L)) L = "#";
+          (groups[L] = groups[L] || []).push(n);
+        });
+
+        var html = "";
+        Object.keys(groups).sort().forEach(function(L){
+          html += '<div class="group-head" id="g-'+L+'">'+L+'</div>';
+          groups[L].forEach(function(n){
+            html += '<div class="entry" data-name="'+encodeURIComponent(n)+'">'+
+                    '<div class="entry-name">'+n+'</div></div>';
+          });
+        });
+        list.innerHTML = html || '<div class="loading">Keine Treffer</div>';
+
+        // letter nav
+        var lt = document.getElementById("letters");
+        lt.innerHTML = Object.keys(groups).sort().map(function(L){
+          return '<a class="letter" href="#g-'+L+'">'+L+'</a>';
+        }).join("");
+
+        // click handlers
+        Array.prototype.forEach.call(list.querySelectorAll(".entry"), function(el){
+          el.addEventListener("click", function(){
+            openDetail(decodeURIComponent(el.getAttribute("data-name")));
+          });
+        });
+      }
+
+      function openDetail(title) {
+        var d = document.createElement("div");
+        d.className = "detail";
+        d.innerHTML = '<button class="detail-close">◄ Zurück</button>'+
+                      '<h2>'+title+'</h2><div class="loading">Lade Eintrag…</div>';
+        document.body.appendChild(d);
+        d.querySelector(".detail-close").addEventListener("click", function(){ d.remove(); });
+
+        var p = { action:"query", prop:"extracts", titles:title,
+                  exintro:"1", explaintext:"1", redirects:"1" };
+        fetch(apiUrl(p)).then(function(r){ return r.json(); }).then(function(data){
+          var pages = data.query.pages;
+          var page = pages[Object.keys(pages)[0]];
+          var extract = (page && page.extract) || "Kein Textauszug verfügbar.";
+          var paras = extract.split("\n").filter(function(s){ return s.trim(); });
+          var body = paras.map(function(t){ return "<p>"+t+"</p>"; }).join("");
+          var url = "https://warhammer40k.fandom.com/wiki/" + encodeURIComponent(title.replace(/ /g,"_"));
+          d.innerHTML = '<button class="detail-close">◄ Zurück</button>'+
+                        '<h2>'+title+'</h2>'+body+
+                        '<a class="src" href="'+url+'" target="_blank" rel="noopener">◈ Quelle: Warhammer 40k Wiki ↗</a>';
+          d.querySelector(".detail-close").addEventListener("click", function(){ d.remove(); });
+        }).catch(function(e){
+          d.innerHTML = '<button class="detail-close">◄ Zurück</button>'+
+                        '<h2>'+title+'</h2><p style="color:#ff5555">Fehler beim Laden: '+e.message+'</p>';
+          d.querySelector(".detail-close").addEventListener("click", function(){ d.remove(); });
+        });
+      }
+
+      document.getElementById("filter").addEventListener("input", function(e){
+        render(e.target.value);
+      });
+
+      loadAll().then(function(){
+        render("");
+      }).catch(function(e){
+        document.getElementById("list").innerHTML =
+          '<div class="loading" style="color:#ff5555">Fehler: '+e.message+
+          '<br><br>(Im Prototyp evtl. CORS — funktioniert auf GitHub Pages)</div>';
+      });
+    </script>
+  </body>
+</html>
