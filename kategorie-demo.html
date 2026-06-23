@@ -70,16 +70,19 @@
     <script>
       // A CORS proxy lets the browser reach Lexicanum, which otherwise blocks
       // direct cross-origin requests. Fandom needs no proxy.
+      // allorigins returns the raw body via its /raw endpoint.
       // NOTE: public proxies can be slow/unstable; for a real app, host your own.
-      var CORS_PROXY = "https://corsproxy.io/?url=";
+      var CORS_PROXY = "https://api.allorigins.win/raw?url=";
 
-      // Curated "important" names shown in a pinned section at the top.
+      // Curated "important" names shown pinned at the top.
+      // These use the EXACT article titles as they appear in the wikis.
       var IMPORTANT = [
-        "Roboute Guilliman", "The Emperor of Mankind", "Marneus Calgar",
+        "Emperor of Mankind", "Roboute Guilliman", "Marneus Calgar",
         "Sanguinius", "Rogal Dorn", "Leman Russ", "Lion El'Jonson",
         "Vulkan", "Jaghatai Khan", "Ferrus Manus", "Corvus Corax",
         "Saint Celestine", "Belisarius Cawl", "Sebastian Yarrick",
-        "Commissar Cain", "Gabriel Angelos", "Kaldor Draigo"
+        "Ciaphas Cain", "Gabriel Angelos", "Kaldor Draigo",
+        "Malcador the Sigillite"
       ];
       var importantSet = {};
       IMPORTANT.forEach(function(n){ importantSet[n.toLowerCase()] = true; });
@@ -252,6 +255,13 @@
       });
 
       loadAll().then(function(){
+        // Guarantee the important figures exist even if not in the category list.
+        IMPORTANT.forEach(function(name){
+          var key = name.toLowerCase();
+          if (!entriesByKey[key]) {
+            entriesByKey[key] = { title: name, sources: WIKIS.slice() };
+          }
+        });
         render("");
       }).catch(function(e){
         document.getElementById("list").innerHTML =
