@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================ -->
-<!-- LEXICANUM V9 - VORAB UEBERSETZT (kein Babel) -->
+<!-- LEXICANUM V10 - VORAB UEBERSETZT (kein Babel) -->
 <!-- ============================================ -->
 <html lang="en">
   <head>
@@ -40,7 +40,7 @@ const {
  * APP VERSION — bump this whenever the app changes, so the displayed number
  * confirms the device is running the latest uploaded file. Shown under the logo.
  * ========================================================================== */
-const APP_VERSION = "v9";
+const APP_VERSION = "v10";
 
 /* ============================================================================
  * DATA SOURCES — MediaWiki community wikis (no AI, no API key, free)
@@ -120,6 +120,54 @@ async function searchAllWikis(term, limit = 12) {
     throw new Error(reasons || "No results found in either archive.");
   }
   return merged;
+}
+
+// Load ALL members of a category from one wiki, following cmcontinue.
+// Returns array of titles. Fails quietly (e.g. Lexicanum bot block).
+async function loadCategoryFrom(source, category) {
+  if (!category) return [];
+  const titles = [];
+  let cont = null;
+  try {
+    do {
+      const params = {
+        action: "query",
+        list: "categorymembers",
+        cmtitle: category,
+        cmlimit: "500",
+        cmtype: "page"
+      };
+      if (cont) params.cmcontinue = cont;
+      const res = await fetch(wikiUrl(source, params));
+      if (!res.ok) break;
+      const data = await res.json();
+      const members = data?.query?.categorymembers || [];
+      members.forEach(m => titles.push(m.title));
+      cont = data?.continue?.cmcontinue || null;
+    } while (cont);
+  } catch (e) {
+    // ignore — one wiki may be unreachable
+  }
+  return titles;
+}
+
+// Load a category from both wikis and merge by title.
+// Returns array of { title, sources:[source,...] }, sorted alphabetically.
+async function loadCategoryMerged(categoryByWiki) {
+  const byKey = {};
+  await Promise.all(WIKI_SOURCES.map(async source => {
+    const category = categoryByWiki[source.id];
+    const titles = await loadCategoryFrom(source, category);
+    titles.forEach(title => {
+      const key = title.toLowerCase();
+      if (!byKey[key]) byKey[key] = {
+        title,
+        sources: []
+      };
+      if (!byKey[key].sources.includes(source)) byKey[key].sources.push(source);
+    });
+  }));
+  return Object.values(byKey).sort((a, b) => a.title.localeCompare(b.title));
 }
 
 // Fetch a parsed article (intro sections) from a wiki by exact title.
@@ -658,6 +706,225 @@ const INDEX_TYPES = [{
   desc: "Wars, campaigns & events"
 }];
 
+/* ============================================================================
+ * CATEGORY OVERVIEWS — real wiki categories per faction & topic.
+ * The index types above map to actual MediaWiki categories here, so an index
+ * click loads the FULL category list (not a keyword search), with important
+ * names pinned on top. "fandom"/"lexicanum" must match the wikis EXACTLY.
+ * Imperium is fully researched; other factions are best-effort and may need
+ * correcting (verify the category name on the wiki if a list comes back empty).
+ * ========================================================================== */
+const CATEGORY_MAP = {
+  imperium: {
+    personae: {
+      fandom: "Category:Imperial Characters",
+      lexicanum: "Category:Characters (Imperial)"
+    },
+    worlds: {
+      fandom: "Category:Imperial planets",
+      lexicanum: "Category:Planets (Imperial)"
+    },
+    tech: {
+      fandom: "Category:Imperial Technology",
+      lexicanum: "Category:Technology"
+    },
+    weapons: {
+      fandom: "Category:Imperial weapons",
+      lexicanum: "Category:Weapons"
+    },
+    organisations: {
+      fandom: "Category:Imperium",
+      lexicanum: "Category:Imperial Organisations"
+    },
+    battles: {
+      fandom: "Category:Imperial Campaigns",
+      lexicanum: "Category:Battles"
+    }
+  },
+  chaos: {
+    personae: {
+      fandom: "Category:Chaos Characters",
+      lexicanum: "Category:Characters (Chaos)"
+    },
+    worlds: {
+      fandom: "Category:Chaos planets",
+      lexicanum: ""
+    },
+    tech: {
+      fandom: "Category:Chaos Technology",
+      lexicanum: ""
+    },
+    weapons: {
+      fandom: "Category:Chaos weapons",
+      lexicanum: ""
+    },
+    organisations: {
+      fandom: "Category:Chaos",
+      lexicanum: ""
+    },
+    battles: {
+      fandom: "Category:Chaos Campaigns",
+      lexicanum: ""
+    }
+  },
+  eldar: {
+    personae: {
+      fandom: "Category:Eldar Characters",
+      lexicanum: ""
+    },
+    worlds: {
+      fandom: "Category:Eldar planets",
+      lexicanum: ""
+    },
+    tech: {
+      fandom: "Category:Eldar Technology",
+      lexicanum: ""
+    },
+    weapons: {
+      fandom: "Category:Eldar weapons",
+      lexicanum: ""
+    },
+    organisations: {
+      fandom: "Category:Eldar",
+      lexicanum: ""
+    },
+    battles: {
+      fandom: "Category:Eldar Campaigns",
+      lexicanum: ""
+    }
+  },
+  orks: {
+    personae: {
+      fandom: "Category:Ork Characters",
+      lexicanum: ""
+    },
+    worlds: {
+      fandom: "Category:Ork planets",
+      lexicanum: ""
+    },
+    tech: {
+      fandom: "Category:Ork Technology",
+      lexicanum: ""
+    },
+    weapons: {
+      fandom: "Category:Ork weapons",
+      lexicanum: ""
+    },
+    organisations: {
+      fandom: "Category:Ork",
+      lexicanum: ""
+    },
+    battles: {
+      fandom: "Category:Ork Campaigns",
+      lexicanum: ""
+    }
+  },
+  necrons: {
+    personae: {
+      fandom: "Category:Necron Characters",
+      lexicanum: ""
+    },
+    worlds: {
+      fandom: "Category:Necron planets",
+      lexicanum: ""
+    },
+    tech: {
+      fandom: "Category:Necron Technology",
+      lexicanum: ""
+    },
+    weapons: {
+      fandom: "Category:Necron weapons",
+      lexicanum: ""
+    },
+    organisations: {
+      fandom: "Category:Necron",
+      lexicanum: ""
+    },
+    battles: {
+      fandom: "Category:Necron Campaigns",
+      lexicanum: ""
+    }
+  },
+  tau: {
+    personae: {
+      fandom: "Category:Tau Characters",
+      lexicanum: ""
+    },
+    worlds: {
+      fandom: "Category:Tau planets",
+      lexicanum: ""
+    },
+    tech: {
+      fandom: "Category:Tau Technology",
+      lexicanum: ""
+    },
+    weapons: {
+      fandom: "Category:Tau weapons",
+      lexicanum: ""
+    },
+    organisations: {
+      fandom: "Category:Tau",
+      lexicanum: ""
+    },
+    battles: {
+      fandom: "Category:Tau Campaigns",
+      lexicanum: ""
+    }
+  }
+};
+
+// Curated important names, pinned to the top of each overview.
+const IMPORTANT_MAP = {
+  imperium: {
+    personae: ["Emperor of Mankind", "Roboute Guilliman", "Marneus Calgar", "Sanguinius", "Rogal Dorn", "Leman Russ", "Lion El'Jonson", "Vulkan", "Jaghatai Khan", "Sebastian Yarrick", "Ciaphas Cain", "Saint Celestine", "Belisarius Cawl", "Malcador the Sigillite"],
+    worlds: ["Terra", "Mars", "Macragge", "Cadia", "Armageddon", "Baal", "Fenris", "Catachan", "Krieg"],
+    tech: ["Power Armour", "Terminator Armour", "Golden Throne", "Astronomican", "Standard Template Construct", "Rhino", "Land Raider"],
+    weapons: ["Bolter", "Lasgun", "Chainsword", "Power Sword", "Plasma Gun", "Power Fist", "Melta", "Flamer"],
+    organisations: ["Adeptus Astartes", "Adeptus Mechanicus", "Adeptus Custodes", "Inquisition", "Astra Militarum", "Adepta Sororitas", "Adeptus Arbites", "Imperial Navy", "Ecclesiarchy"],
+    battles: ["Horus Heresy", "Battle of Terra", "Fall of Cadia", "Second War for Armageddon", "Damocles Crusade", "Badab War", "13th Black Crusade"]
+  },
+  chaos: {
+    personae: ["Horus", "Abaddon the Despoiler", "Fulgrim", "Mortarion", "Magnus the Red", "Angron", "Perturabo", "Lorgar", "Kharn the Betrayer"],
+    worlds: ["Eye of Terror", "Medrengard"],
+    tech: [],
+    weapons: [],
+    organisations: ["Black Legion", "Word Bearers", "Death Guard", "Thousand Sons", "World Eaters"],
+    battles: ["Horus Heresy", "13th Black Crusade", "Siege of Terra"]
+  },
+  eldar: {
+    personae: ["Eldrad Ulthran", "Asurmen", "Jain Zar", "Maugan Ra", "Yvraine"],
+    worlds: ["Craftworld Ulthwé", "Craftworld Biel-Tan", "Craftworld Iyanden"],
+    tech: [],
+    weapons: ["Shuriken Catapult"],
+    organisations: ["Aspect Warriors", "Harlequins"],
+    battles: []
+  },
+  orks: {
+    personae: ["Ghazghkull Thraka", "Mad Dok Grotsnik"],
+    worlds: ["Octarius"],
+    tech: [],
+    weapons: ["Choppa", "Shoota"],
+    organisations: ["Goffs", "Bad Moons", "Evil Sunz"],
+    battles: ["War of the Beast"]
+  },
+  necrons: {
+    personae: ["Imotekh the Stormlord", "Trazyn the Infinite", "Orikan the Diviner", "Szarekh"],
+    worlds: ["Mandragora"],
+    tech: ["Living Metal"],
+    weapons: ["Gauss Flayer"],
+    organisations: ["Sautekh Dynasty"],
+    battles: []
+  },
+  tau: {
+    personae: ["Commander Farsight", "Commander Shadowsun", "Aun'Va"],
+    worlds: ["T'au", "Vior'la"],
+    tech: ["Battlesuit"],
+    weapons: ["Pulse Rifle", "Railgun"],
+    organisations: ["Fire Caste", "Ethereal Caste"],
+    battles: ["Damocles Crusade"]
+  }
+};
+
 // Index types that only make sense for certain factions, keyed by faction id.
 const FACTION_INDEX_TYPES = {
   imperium: [{
@@ -691,6 +958,7 @@ function Warhammer40KEncyclopedia() {
   const [searchHits, setSearchHits] = useState(null);
   const [indexLoading, setIndexLoading] = useState(false);
   const [activeIndexType, setActiveIndexType] = useState(null);
+  const [indexFilter, setIndexFilter] = useState("");
   const inputRef = useRef(null);
   const cacheRef = useRef({});
   const topRef = useRef(null);
@@ -745,18 +1013,59 @@ function Warhammer40KEncyclopedia() {
     setIndexData(null);
     setSearchHits(null);
     setActiveIndexType(indexType);
-
-    // Build a wiki search term combining the faction and the index topic.
-    const term = `${activeFaction.shortName} ${indexType.query}`;
+    setIndexFilter("");
     try {
-      const hits = await searchAllWikis(term, 18);
+      // Look up the real wiki categories for this faction + topic.
+      const catMap = (CATEGORY_MAP[activeFaction.id] || {})[indexType.id];
+      let entries = [];
+      if (catMap) {
+        // Load the FULL category list from both wikis, merged.
+        const merged = await loadCategoryMerged({
+          fandom: catMap.fandom,
+          lexicanum: catMap.lexicanum
+        });
+        entries = merged.map(e => ({
+          name: e.title,
+          sources: e.sources,
+          source: e.sources[0]
+        }));
+      }
+
+      // Pin curated important names on top (force-add if missing from the list).
+      const important = (IMPORTANT_MAP[activeFaction.id] || {})[indexType.id] || [];
+      const haveKeys = new Set(entries.map(e => e.name.toLowerCase()));
+      const importantSet = new Set(important.map(n => n.toLowerCase()));
+      const importantEntries = important.map(name => {
+        const existing = entries.find(e => e.name.toLowerCase() === name.toLowerCase());
+        return existing || {
+          name,
+          sources: WIKI_SOURCES,
+          source: WIKI_SOURCES[0],
+          forced: true
+        };
+      });
+      // Remaining (non-important) entries, alphabetical.
+      const rest = entries.filter(e => !importantSet.has(e.name.toLowerCase()));
+
+      // Fallback: if no category configured/returned, use the old keyword search.
+      if (!entries.length && !important.length) {
+        const term = `${activeFaction.shortName} ${indexType.query}`;
+        const hits = await searchAllWikis(term, 18);
+        setIndexData({
+          indexTitle: `${indexType.label} — ${activeFaction.shortName}`,
+          entries: hits.map(h => ({
+            name: h.title,
+            blurb: h.snippet,
+            source: h.source
+          }))
+        });
+        return;
+      }
       setIndexData({
         indexTitle: `${indexType.label} — ${activeFaction.shortName}`,
-        entries: hits.map(h => ({
-          name: h.title,
-          blurb: h.snippet,
-          source: h.source
-        }))
+        important: importantEntries,
+        entries: rest,
+        totalCount: importantEntries.length + rest.length
       });
     } catch (err) {
       setError("THE INDEX HAS FAILED. The machine spirit reports: " + (err?.message || "unknown disturbance.") + " — Often a cross-origin (CORS) restriction in the preview; works in the standalone app.");
@@ -1744,6 +2053,45 @@ function Warhammer40KEncyclopedia() {
       color: ${colors.text}88;
       line-height: 1.4;
     }
+    .index-entry-src {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1px;
+      color: ${colors.primary}aa;
+    }
+    .index-filter {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      background: ${colors.surface || "#140e02"};
+      border: 1px solid ${colors.primary}66;
+      color: ${colors.text};
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+      letter-spacing: 1px;
+      outline: none;
+    }
+    .index-filter:focus {
+      border-color: ${colors.primary};
+      box-shadow: 0 0 0 2px ${colors.glow};
+    }
+    .index-filter::placeholder { color: ${colors.text}55; }
+    .index-group-head {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: ${colors.accent};
+      padding: 12px 0 6px;
+      border-bottom: 1px solid ${colors.primary}33;
+      margin-bottom: 4px;
+    }
+    .index-group-head.important {
+      color: ${colors.bg || "#0a0700"};
+      background: ${colors.primary};
+      padding: 8px 12px;
+      border: none;
+      margin-bottom: 6px;
+    }
     .index-entry-arrow {
       color: ${colors.text}44;
       font-size: 11px;
@@ -2168,23 +2516,60 @@ function Warhammer40KEncyclopedia() {
     className: "index-header-title"
   }, indexData.indexTitle || activeIndexType?.label), /*#__PURE__*/React.createElement("div", {
     className: "index-header-sub"
-  }, activeFaction.name, " \u2014 ", indexData.entries?.length || 0, " entries"))), /*#__PURE__*/React.createElement("div", {
-    className: "index-list"
-  }, indexData.entries?.map((entry, i) => /*#__PURE__*/React.createElement("button", {
-    key: i,
-    className: "index-entry",
-    onClick: () => openArticle(entry.name, entry.source)
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "index-entry-num"
-  }, String(i + 1).padStart(2, "0")), /*#__PURE__*/React.createElement("span", {
-    className: "index-entry-body"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "index-entry-name"
-  }, entry.name), /*#__PURE__*/React.createElement("span", {
-    className: "index-entry-blurb"
-  }, entry.blurb)), /*#__PURE__*/React.createElement("span", {
-    className: "index-entry-arrow"
-  }, "\u27A4"))))), results && !isLoading && /*#__PURE__*/React.createElement("div", {
+  }, activeFaction.name, " \u2014 ", indexData.totalCount ?? (indexData.entries?.length || 0), " entries"))), (indexData.important || indexData.entries) && /*#__PURE__*/React.createElement("input", {
+    className: "index-filter",
+    placeholder: "> FILTER ENTRIES...",
+    value: indexFilter,
+    onChange: e => setIndexFilter(e.target.value)
+  }), indexData.important && indexData.important.length > 0 && (() => {
+    const f = indexFilter.trim().toLowerCase();
+    const shown = f ? indexData.important.filter(e => e.name.toLowerCase().includes(f)) : indexData.important;
+    if (!shown.length) return null;
+    return /*#__PURE__*/React.createElement("div", {
+      className: "index-list"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "index-group-head important"
+    }, "\u2605 WICHTIGE"), shown.map((entry, i) => /*#__PURE__*/React.createElement("button", {
+      key: "imp" + i,
+      className: "index-entry",
+      onClick: () => openArticle(entry.name, entry.source)
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "index-entry-num"
+    }, "\u2605"), /*#__PURE__*/React.createElement("span", {
+      className: "index-entry-body"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "index-entry-name"
+    }, entry.name), /*#__PURE__*/React.createElement("span", {
+      className: "index-entry-src"
+    }, entry.sources?.map(s => s.id === "lexicanum" ? "LEX" : "FAN").join(" · "))), /*#__PURE__*/React.createElement("span", {
+      className: "index-entry-arrow"
+    }, "\u27A4"))));
+  })(), (() => {
+    const f = indexFilter.trim().toLowerCase();
+    const list = f ? (indexData.entries || []).filter(e => e.name.toLowerCase().includes(f)) : indexData.entries || [];
+    if (!list.length) return null;
+    return /*#__PURE__*/React.createElement("div", {
+      className: "index-list"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "index-group-head"
+    }, "ALLE EINTR\xC4GE"), list.map((entry, i) => /*#__PURE__*/React.createElement("button", {
+      key: i,
+      className: "index-entry",
+      onClick: () => openArticle(entry.name, entry.source)
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "index-entry-num"
+    }, String(i + 1).padStart(2, "0")), /*#__PURE__*/React.createElement("span", {
+      className: "index-entry-body"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "index-entry-name"
+    }, entry.name), entry.blurb ? /*#__PURE__*/React.createElement("span", {
+      className: "index-entry-blurb"
+    }, entry.blurb) : entry.sources ? /*#__PURE__*/React.createElement("span", {
+      className: "index-entry-src"
+    }, entry.sources.map(s => s.id === "lexicanum" ? "LEX" : "FAN").join(" · ")) : null), /*#__PURE__*/React.createElement("span", {
+      className: "index-entry-arrow"
+    }, "\u27A4"))));
+  })()), results && !isLoading && /*#__PURE__*/React.createElement("div", {
     className: "result-container"
   }, /*#__PURE__*/React.createElement("button", {
     className: "back-btn",
