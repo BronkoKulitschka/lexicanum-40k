@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================ -->
-<!-- LEXICANUM V10 - VORAB UEBERSETZT (kein Babel) -->
+<!-- LEXICANUM V0.11 - VORAB UEBERSETZT (kein Babel) -->
 <!-- ============================================ -->
 <html lang="en">
   <head>
@@ -40,7 +40,7 @@ const {
  * APP VERSION — bump this whenever the app changes, so the displayed number
  * confirms the device is running the latest uploaded file. Shown under the logo.
  * ========================================================================== */
-const APP_VERSION = "v10";
+const APP_VERSION = "v0.11";
 
 /* ============================================================================
  * DATA SOURCES — MediaWiki community wikis (no AI, no API key, free)
@@ -747,7 +747,7 @@ const CATEGORY_MAP = {
       lexicanum: "Category:Characters (Chaos)"
     },
     worlds: {
-      fandom: "Category:Chaos planets",
+      fandom: "Category:Daemon Worlds",
       lexicanum: ""
     },
     tech: {
@@ -755,7 +755,7 @@ const CATEGORY_MAP = {
       lexicanum: ""
     },
     weapons: {
-      fandom: "Category:Chaos weapons",
+      fandom: "Category:Chaos Weapons",
       lexicanum: ""
     },
     organisations: {
@@ -763,7 +763,7 @@ const CATEGORY_MAP = {
       lexicanum: ""
     },
     battles: {
-      fandom: "Category:Chaos Campaigns",
+      fandom: "Category:Campaigns",
       lexicanum: ""
     }
   },
@@ -884,12 +884,12 @@ const IMPORTANT_MAP = {
     battles: ["Horus Heresy", "Battle of Terra", "Fall of Cadia", "Second War for Armageddon", "Damocles Crusade", "Badab War", "13th Black Crusade"]
   },
   chaos: {
-    personae: ["Horus", "Abaddon the Despoiler", "Fulgrim", "Mortarion", "Magnus the Red", "Angron", "Perturabo", "Lorgar", "Kharn the Betrayer"],
-    worlds: ["Eye of Terror", "Medrengard"],
-    tech: [],
-    weapons: [],
-    organisations: ["Black Legion", "Word Bearers", "Death Guard", "Thousand Sons", "World Eaters"],
-    battles: ["Horus Heresy", "13th Black Crusade", "Siege of Terra"]
+    personae: ["Horus", "Abaddon the Despoiler", "Fulgrim", "Mortarion", "Magnus the Red", "Angron", "Perturabo", "Lorgar", "Kharn the Betrayer", "Ahriman", "Typhus", "Fabius Bile"],
+    worlds: ["Medrengard", "Sicarus", "Plague Planet", "Planet of the Sorcerers", "Maeleum", "Davin"],
+    tech: ["Daemon Engine", "Defiler", "Soul Grinder", "Forgefiend", "Heldrake", "Chaos Titan"],
+    weapons: ["Daemon Weapon", "Chainaxe", "Hellblade", "Baleflamer", "Hades Autocannon"],
+    organisations: ["Black Legion", "Word Bearers", "Death Guard", "Thousand Sons", "World Eaters", "Emperor's Children", "Iron Warriors", "Night Lords", "Alpha Legion"],
+    battles: ["Horus Heresy", "13th Black Crusade", "Siege of Terra", "Battle of Skalathrax"]
   },
   eldar: {
     personae: ["Eldrad Ulthran", "Asurmen", "Jain Zar", "Maugan Ra", "Yvraine"],
@@ -1180,12 +1180,13 @@ function Warhammer40KEncyclopedia() {
       position: relative;
       background: ${colors.bg};
       background-image:
-        radial-gradient(ellipse at 50% 40%, ${colors.glow.replace("0.4", "0.10")} 0%, transparent 70%),
-        radial-gradient(ellipse at 50% 120%, ${colors.glow.replace("0.4", "0.06")} 0%, transparent 60%);
+        radial-gradient(ellipse at 50% 40%, ${colors.glow.replace("0.4", "0.18")} 0%, transparent 75%),
+        radial-gradient(ellipse at 50% 120%, ${colors.glow.replace("0.4", "0.10")} 0%, transparent 65%);
       font-family: 'Share Tech Mono', 'Source Serif 4', monospace;
       color: ${colors.text};
       text-shadow: 0 0 1px ${colors.glow.replace("0.4", "0.5")};
       transition: all 0.4s ease;
+      filter: brightness(1.18) contrast(1.04);
     }
 
     /* CRT scanlines overlay */
