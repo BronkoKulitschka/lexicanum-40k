@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================ -->
-<!-- LEXICANUM V0.12 - VORAB UEBERSETZT (kein Babel) -->
+<!-- LEXICANUM V0.13 - VORAB UEBERSETZT (kein Babel) -->
 <!-- ============================================ -->
 <html lang="en">
   <head>
@@ -40,7 +40,7 @@ const {
  * APP VERSION — bump this whenever the app changes, so the displayed number
  * confirms the device is running the latest uploaded file. Shown under the logo.
  * ========================================================================== */
-const APP_VERSION = "v0.12";
+const APP_VERSION = "v0.13";
 
 /* ============================================================================
  * DATA SOURCES — MediaWiki community wikis (no AI, no API key, free)
@@ -796,10 +796,10 @@ const CATEGORY_MAP = {
   orks: {
     personae: {
       fandom: "Category:Ork Characters",
-      lexicanum: ""
+      lexicanum: "Category:Characters (Ork)"
     },
     worlds: {
-      fandom: "Category:Ork planets",
+      fandom: "Category:Ork Tribes",
       lexicanum: ""
     },
     tech: {
@@ -807,7 +807,7 @@ const CATEGORY_MAP = {
       lexicanum: ""
     },
     weapons: {
-      fandom: "Category:Ork weapons",
+      fandom: "Category:Ork Weapons",
       lexicanum: ""
     },
     organisations: {
@@ -815,7 +815,7 @@ const CATEGORY_MAP = {
       lexicanum: ""
     },
     battles: {
-      fandom: "Category:Ork Campaigns",
+      fandom: "Category:Campaigns",
       lexicanum: ""
     }
   },
@@ -900,12 +900,12 @@ const IMPORTANT_MAP = {
     battles: ["Fall of the Aeldari", "Battle of Iyanden", "Battle of Biel-Tan"]
   },
   orks: {
-    personae: ["Ghazghkull Thraka", "Mad Dok Grotsnik"],
-    worlds: ["Octarius"],
-    tech: [],
-    weapons: ["Choppa", "Shoota"],
-    organisations: ["Goffs", "Bad Moons", "Evil Sunz"],
-    battles: ["War of the Beast"]
+    personae: ["Ghazghkull Mag Uruk Thraka", "Grotsnik", "Kaptin Badrukk", "Gorgutz 'Ead 'Unter", "Old Zogwort", "Wazdakka Gutsmek", "Nazdreg Ug Urdgrub", "Snagrod", "Tuska", "Zodgrod Wortsnagga"],
+    worlds: ["Ullanor", "Octarius", "Charadon", "Gorro"],
+    tech: ["Gargant", "Killa Kan", "Deff Dread", "Battlewagon", "Mek Speshul", "Cybork", "Force Field"],
+    weapons: ["Shoota", "Choppa", "Power Klaw", "Burna", "Big Shoota", "Rokkit Launcha", "Kustom Mega-Blasta", "Grot Blasta"],
+    organisations: ["Goffs", "Bad Moons", "Evil Sunz", "Deathskulls", "Blood Axes", "Snakebites", "Freebooterz", "Speed Freeks"],
+    battles: ["War of the Beast", "Second War for Armageddon", "Third War for Armageddon", "Battle of Ullanor"]
   },
   necrons: {
     personae: ["Imotekh the Stormlord", "Trazyn the Infinite", "Orikan the Diviner", "Szarekh"],
