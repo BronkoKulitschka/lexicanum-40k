@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================ -->
-<!-- LEXICANUM V0.52 - VORAB UEBERSETZT (kein Babel) -->
+<!-- LEXICANUM V0.53 - VORAB UEBERSETZT (kein Babel) -->
 <!-- ============================================ -->
 <html lang="en">
   <head>
@@ -40,7 +40,7 @@ const {
  * APP VERSION — bump this whenever the app changes, so the displayed number
  * confirms the device is running the latest uploaded file. Shown under the logo.
  * ========================================================================== */
-const APP_VERSION = "v0.52";
+const APP_VERSION = "v0.53";
 
 /* ============================================================================
  * DATA SOURCES — MediaWiki community wikis (no AI, no API key, free)
@@ -666,6 +666,65 @@ const FACTIONS = [{
     topic: "T'au drone technology and AI",
     tag: "Technology"
   }]
+}, {
+  id: "minor",
+  name: "Minor Factions",
+  shortName: "Minor Factions",
+  symbol: "◈",
+  colors: {
+    primary: "#c8ccd0",
+    secondary: "#8a9098",
+    bg: "#07080a",
+    surface: "#111418",
+    accent: "#e8ecf0",
+    glow: "rgba(200,204,208,0.35)",
+    text: "#c0c6cc",
+    border: "#6a7078",
+    gradient: "linear-gradient(135deg, #111418 0%, #07080a 100%)"
+  },
+  description: "Lesser-known peoples, powers and species of the galaxy",
+  categories: ["Xenos", "Human", "Abhuman", "Lost"],
+  browse: [{
+    icon: "◈",
+    title: "Leagues of Votann",
+    topic: "The Leagues of Votann, the Kin",
+    tag: "Xenos"
+  }, {
+    icon: "⬡",
+    title: "Kroot",
+    topic: "The Kroot of Pech",
+    tag: "Xenos"
+  }, {
+    icon: "❂",
+    title: "The Interex",
+    topic: "The Interex, a lost human civilisation",
+    tag: "Lore"
+  }, {
+    icon: "✦",
+    title: "Diasporex",
+    topic: "The Diasporex, human and xenos void-dwellers",
+    tag: "Lore"
+  }, {
+    icon: "▣",
+    title: "Jokaero",
+    topic: "The Jokaero weaponsmiths",
+    tag: "Xenos"
+  }, {
+    icon: "⚡",
+    title: "Hrud",
+    topic: "The Hrud, entropic xenos",
+    tag: "Xenos"
+  }, {
+    icon: "◉",
+    title: "Vespid",
+    topic: "The Vespid Stingwings",
+    tag: "Xenos"
+  }, {
+    icon: "✜",
+    title: "Squats",
+    topic: "The Squats, ancestors of the Kin",
+    tag: "Abhuman"
+  }]
 }];
 const SEARCH_CATEGORIES = ["All", "Characters", "Weapons", "Locations", "Technology", "Lore", "Battles"];
 const INDEX_TYPES = [{
@@ -870,6 +929,32 @@ const CATEGORY_MAP = {
       fandom: "Category:Campaigns",
       lexicanum: ""
     }
+  },
+  minor: {
+    personae: {
+      fandom: "Category:Races",
+      lexicanum: "Category:Minor Alien Species and Factions"
+    },
+    worlds: {
+      fandom: "Category:Leagues of Votann",
+      lexicanum: ""
+    },
+    tech: {
+      fandom: "Category:Kroot",
+      lexicanum: ""
+    },
+    weapons: {
+      fandom: "Category:Genestealer Cult",
+      lexicanum: ""
+    },
+    organisations: {
+      fandom: "Category:Factions",
+      lexicanum: "Category:Species and Factions"
+    },
+    battles: {
+      fandom: "Category:Campaigns",
+      lexicanum: ""
+    }
   }
 };
 
@@ -922,6 +1007,14 @@ const IMPORTANT_MAP = {
     weapons: ["Pulse Rifle", "Railgun", "Rail Rifle", "Fusion Blaster", "Burst Cannon", "Ion Cannon", "Smart Missile System"],
     organisations: ["Fire Caste", "Earth Caste", "Water Caste", "Air Caste", "Ethereal Caste", "Farsight Enclaves", "Kroot", "Vespid"],
     battles: ["Damocles Gulf Crusade", "War of Dakka", "Conquest of Mu'gulath Bay", "Taros Campaign"]
+  },
+  minor: {
+    personae: ["Leagues of Votann", "Kroot", "Interex", "Diasporex", "Jokaero", "Hrud", "Vespid", "Squats", "Genestealer Cult", "Demiurg", "Tarellians", "Loxatl"],
+    worlds: ["Leagues of Votann", "Pech", "Interex", "Demiurg"],
+    tech: ["Kroot", "Votann Ancestor Core", "Digital Weapons"],
+    weapons: ["Kroot Rifle", "Genestealer", "Etacarn Plasma Pistol"],
+    organisations: ["Leagues of Votann", "Interex", "Diasporex", "Severan Dominate", "Genestealer Cult", "Kroot Mercenaries"],
+    battles: ["Interex", "Great Crusade"]
   }
 };
 
