@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================ -->
-<!-- LEXICANUM V0.51 - VORAB UEBERSETZT (kein Babel) -->
+<!-- LEXICANUM V0.52 - VORAB UEBERSETZT (kein Babel) -->
 <!-- ============================================ -->
 <html lang="en">
   <head>
@@ -40,7 +40,7 @@ const {
  * APP VERSION — bump this whenever the app changes, so the displayed number
  * confirms the device is running the latest uploaded file. Shown under the logo.
  * ========================================================================== */
-const APP_VERSION = "v0.51";
+const APP_VERSION = "v0.52";
 
 /* ============================================================================
  * DATA SOURCES — MediaWiki community wikis (no AI, no API key, free)
@@ -946,6 +946,7 @@ const PLACEHOLDER_QUERIES = ["Space Marine Chapter Master", "Necron Dynasties", 
 function Warhammer40KEncyclopedia() {
   const [activeFaction, setActiveFaction] = useState(FACTIONS[0]);
   const [showOptions, setShowOptions] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   const [options, setOptions] = useState({
     brightness: 118,
     // percent (60–160)
@@ -1301,8 +1302,9 @@ function Warhammer40KEncyclopedia() {
     .options-overlay {
       position: fixed; inset: 0; z-index: 10000;
       background: rgba(0,0,0,0.75);
-      display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: flex-start; justify-content: center;
       padding: 20px;
+      overflow-y: auto;
     }
     .options-panel {
       background: ${colors.surface};
@@ -1310,7 +1312,7 @@ function Warhammer40KEncyclopedia() {
       box-shadow: 0 0 30px ${colors.glow};
       max-width: 420px; width: 100%;
       padding: 20px;
-      max-height: 90vh; overflow-y: auto;
+      margin: 12px 0;
     }
     .options-head {
       display: flex; justify-content: space-between; align-items: center;
@@ -1361,6 +1363,33 @@ function Warhammer40KEncyclopedia() {
     .options-note {
       text-align: center; font-size: 10px; color: ${colors.text}77;
       margin-top: 12px; letter-spacing: 1px;
+    }
+
+    /* Info / handbook panel */
+    .info-body h3 {
+      font-family: 'Cinzel', serif; color: ${colors.accent};
+      font-size: 20px; letter-spacing: 1px; margin-bottom: 2px;
+    }
+    .info-body .info-ver {
+      font-size: 10px; letter-spacing: 2px; color: ${colors.primary};
+      text-transform: uppercase; margin-bottom: 14px;
+    }
+    .info-body h4 {
+      font-family: 'Cinzel', serif; color: ${colors.primary};
+      font-size: 13px; letter-spacing: 1px;
+      margin: 18px 0 6px;
+    }
+    .info-body p {
+      font-family: 'Source Serif 4', serif;
+      font-size: 13px; line-height: 1.65;
+      color: ${colors.text}dd; margin-bottom: 8px;
+    }
+    .info-body b { color: ${colors.accent}; }
+    .info-body .info-foot {
+      text-align: center; font-family: 'Cinzel', serif;
+      color: ${colors.primary}; font-size: 12px; letter-spacing: 1px;
+      margin-top: 20px; padding-top: 14px;
+      border-top: 1px solid ${colors.primary}33;
     }
 
     .header {
@@ -2372,7 +2401,24 @@ function Warhammer40KEncyclopedia() {
       opacity: animating ? 0 : 1,
       transition: options.reduceMotion ? "none" : "opacity 0.3s"
     }
-  }, showOptions && /*#__PURE__*/React.createElement("div", {
+  }, showInfo && /*#__PURE__*/React.createElement("div", {
+    className: "options-overlay",
+    onClick: () => setShowInfo(false)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "options-panel info-panel",
+    onClick: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "options-head"
+  }, /*#__PURE__*/React.createElement("span", null, "ℹ HANDBUCH"), /*#__PURE__*/React.createElement("button", {
+    className: "options-close",
+    onClick: () => setShowInfo(false)
+  }, "✕")), /*#__PURE__*/React.createElement("div", {
+    className: "info-body"
+  }, /*#__PURE__*/React.createElement("h3", null, "Lexicanum 40K"), /*#__PURE__*/React.createElement("p", {
+    className: "info-ver"
+  }, "Version ", APP_VERSION, " · Prototyp"), /*#__PURE__*/React.createElement("p", null, "Eine Enzyklopädie für das Warhammer-40.000-Universum. Alle Inhalte werden live aus den Community-Wikis geladen."), /*#__PURE__*/React.createElement("h4", null, "◆ Fraktionen"), /*#__PURE__*/React.createElement("p", null, "Oben wählst du eine der sechs Fraktionen: Imperium, Chaos, Aeldari, Orks, Necrons und T'au. Jede hat ihr eigenes Farbschema und eigene Archive."), /*#__PURE__*/React.createElement("h4", null, "◆ Suche"), /*#__PURE__*/React.createElement("p", null, "Über das Suchfeld findest du Artikel aus beiden Wikis. Tippe einen Begriff ein und wähle aus den Treffern."), /*#__PURE__*/React.createElement("h4", null, "◆ Index-Übersichten"), /*#__PURE__*/React.createElement("p", null, "Jede Fraktion hat sechs Kategorien: Personen, Welten & Orte, Technologie, Waffen, Organisationen und Schlachten. Ein Tipp darauf lädt die vollständige Liste aus dem Wiki."), /*#__PURE__*/React.createElement("p", null, "Ganz oben stehen im Block ", /*#__PURE__*/React.createElement("b", null, "★ WICHTIGE"), " die zentralen Einträge. Darunter folgt die vollständige alphabetische Liste. Mit dem Filterfeld suchst du schnell in langen Listen."), /*#__PURE__*/React.createElement("h4", null, "◆ Artikel"), /*#__PURE__*/React.createElement("p", null, "Ein Tipp auf einen Eintrag öffnet den Artikeltext. Querverweise im Text sind anklickbar und führen zu verwandten Einträgen. Jeder Artikel nennt seine Quelle mit Link zum Original-Wiki."), /*#__PURE__*/React.createElement("h4", null, "◆ Optionen ⚙"), /*#__PURE__*/React.createElement("p", null, "Über das Zahnrad stellst du Helligkeit, Schriftgröße und die CRT-Effekte (Scanlines, Flackern) ein oder reduzierst Bewegung."), /*#__PURE__*/React.createElement("h4", null, "◆ Quellen"), /*#__PURE__*/React.createElement("p", null, "Inhalte stammen vom Warhammer-40k-Fandom-Wiki und von Lexicanum. Alle Namen, Bilder und Inhalte sind Eigentum von Games Workshop bzw. der jeweiligen Wikis (CC-BY-SA). Diese App ist ein inoffizielles, nicht-kommerzielles Fan-Projekt."), /*#__PURE__*/React.createElement("p", {
+    className: "info-foot"
+  }, "✠ Wissen ist Macht — bewahre es gut ✠")))), showOptions && /*#__PURE__*/React.createElement("div", {
     className: "options-overlay",
     onClick: () => setShowOptions(false)
   }, /*#__PURE__*/React.createElement("div", {
@@ -2469,6 +2515,11 @@ function Warhammer40KEncyclopedia() {
       color: colors.accent
     }
   }, activeFaction.name.toUpperCase())), /*#__PURE__*/React.createElement("button", {
+    className: "gear-btn",
+    onClick: () => setShowInfo(true),
+    title: "Info & Handbuch",
+    "aria-label": "Info und Handbuch"
+  }, "ℹ"), /*#__PURE__*/React.createElement("button", {
     className: "gear-btn",
     onClick: () => setShowOptions(true),
     title: "Optionen",
