@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================ -->
-<!-- LEXICANUM V0.53 - VORAB UEBERSETZT (kein Babel) -->
+<!-- LEXICANUM V0.54 - VORAB UEBERSETZT (kein Babel) -->
 <!-- ============================================ -->
 <html lang="en">
   <head>
@@ -40,7 +40,7 @@ const {
  * APP VERSION — bump this whenever the app changes, so the displayed number
  * confirms the device is running the latest uploaded file. Shown under the logo.
  * ========================================================================== */
-const APP_VERSION = "v0.53";
+const APP_VERSION = "v0.54";
 
 /* ============================================================================
  * DATA SOURCES — MediaWiki community wikis (no AI, no API key, free)
@@ -1018,6 +1018,80 @@ const IMPORTANT_MAP = {
   }
 };
 
+/* ============================================================================
+ * MINOR FACTIONS — a curated list of the galaxy's lesser-known peoples.
+ * The Minor Factions tab shows this as a single filterable list; a click
+ * opens the full wiki article for that faction. Each has the exact article
+ * title so the lookup works, plus a short blurb.
+ * ========================================================================== */
+const MINOR_FACTIONS = [{
+  title: "Leagues of Votann",
+  blurb: "Squat abhuman confederations of the galactic core — 'the Kin'."
+}, {
+  title: "Kroot",
+  blurb: "Avian mercenary xenos of Pech who evolve by devouring their foes."
+}, {
+  title: "Interex",
+  blurb: "An advanced lost human civilisation destroyed during the Great Crusade."
+}, {
+  title: "Diasporex",
+  blurb: "A void-dwelling coalition of humans and xenos living among the stars."
+}, {
+  title: "Jokaero",
+  blurb: "Orang-utan-like xenos and the galaxy's greatest weaponsmiths."
+}, {
+  title: "Hrud",
+  blurb: "Shadowy, migratory xenos who emit an entropic aura of decay."
+}, {
+  title: "Vespid",
+  blurb: "Insectoid Stingwings allied to the T'au Empire."
+}, {
+  title: "Squats",
+  blurb: "The ancestral abhuman holds, forerunners of the Leagues of Votann."
+}, {
+  title: "Genestealer Cult",
+  blurb: "Hidden Tyranid-spawned subversive cults on Imperial worlds."
+}, {
+  title: "Demiurg",
+  blurb: "Stout spacefaring xenos traders allied with the T'au."
+}, {
+  title: "Tarellians",
+  blurb: "Reptilian 'Dog-Soldiers' who serve as mercenaries."
+}, {
+  title: "Loxatl",
+  blurb: "Amphibious reptilian xenos mercenaries with flechette weapons."
+}, {
+  title: "Rak'Gol",
+  blurb: "Savage, cybernetic reptilian marauders of the Koronus Expanse."
+}, {
+  title: "Q'Orgg",
+  blurb: "Little-known xenos species of the galactic fringe."
+}, {
+  title: "Nicassar",
+  blurb: "Ursine psychic xenos of the T'au Empire's void fleets."
+}, {
+  title: "Fra'al",
+  blurb: "Ancient, technologically advanced raiders and slavers."
+}, {
+  title: "Enslavers",
+  blurb: "Warp-born entities that dominate the minds of the living."
+}, {
+  title: "Slann",
+  blurb: "Ancient amphibious beings, possibly linked to the Old Ones."
+}, {
+  title: "Old Ones",
+  blurb: "The enigmatic ancient reptilian creators of many xenos races."
+}, {
+  title: "Zoat",
+  blurb: "Centauroid xenos briefly encountered by the Imperium."
+}, {
+  title: "Severan Dominate",
+  blurb: "A breakaway human stellar empire of the Spinward Front."
+}, {
+  title: "Umbra",
+  blurb: "Mysterious and dangerous Warp-touched xenos entities."
+}];
+
 // Index types that only make sense for certain factions, keyed by faction id.
 const FACTION_INDEX_TYPES = {
   imperium: [{
@@ -1069,6 +1143,7 @@ function Warhammer40KEncyclopedia() {
   const [indexLoading, setIndexLoading] = useState(false);
   const [activeIndexType, setActiveIndexType] = useState(null);
   const [indexFilter, setIndexFilter] = useState("");
+  const [minorFilter, setMinorFilter] = useState("");
   const inputRef = useRef(null);
   const cacheRef = useRef({});
   const topRef = useRef(null);
@@ -2303,6 +2378,31 @@ function Warhammer40KEncyclopedia() {
       box-shadow: 0 0 0 2px ${colors.glow};
     }
     .index-filter::placeholder { color: ${colors.text}55; }
+
+    /* Minor factions list */
+    .minor-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+    .minor-entry {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px;
+      background: ${colors.surface};
+      border: 1px solid ${colors.border}44;
+      cursor: pointer; text-align: left;
+      transition: ${options.reduceMotion ? "none" : "all 0.15s"};
+    }
+    .minor-entry:hover {
+      border-color: ${colors.primary};
+      background: ${colors.glow};
+    }
+    .minor-entry-body { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .minor-entry-name {
+      font-family: 'Cinzel', serif; font-size: 15px; letter-spacing: 1px;
+      color: ${colors.accent};
+    }
+    .minor-entry-blurb {
+      font-family: 'Source Serif 4', serif; font-size: 12px;
+      color: ${colors.text}bb; line-height: 1.5;
+    }
+    .minor-entry-arrow { color: ${colors.primary}88; font-size: 12px; flex-shrink: 0; }
     .index-group-head {
       font-family: 'Cinzel', serif;
       font-size: 13px;
@@ -2720,7 +2820,32 @@ function Warhammer40KEncyclopedia() {
       letterSpacing: "2px",
       color: colors.text + "44"
     }
-  }, activeFaction.description.toUpperCase())), /*#__PURE__*/React.createElement("div", {
+  }, activeFaction.description.toUpperCase())), activeFaction.id === "minor" ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "browse-header"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "browse-eyebrow"
+  }, "⬛ Übersicht"), /*#__PURE__*/React.createElement("span", {
+    className: "browse-faction-name"
+  }, "Die kleineren Fraktionen der Galaxis")), /*#__PURE__*/React.createElement("input", {
+    className: "index-filter",
+    placeholder: "> FRAKTION FILTERN...",
+    value: minorFilter,
+    onChange: e => setMinorFilter(e.target.value)
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "minor-list"
+  }, MINOR_FACTIONS.filter(f => !minorFilter.trim() || f.title.toLowerCase().includes(minorFilter.trim().toLowerCase()) || f.blurb.toLowerCase().includes(minorFilter.trim().toLowerCase())).sort((a, b) => a.title.localeCompare(b.title)).map((f, i) => /*#__PURE__*/React.createElement("button", {
+    key: i,
+    className: "minor-entry",
+    onClick: () => openArticle(f.title)
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "minor-entry-body"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "minor-entry-name"
+  }, f.title), /*#__PURE__*/React.createElement("span", {
+    className: "minor-entry-blurb"
+  }, f.blurb)), /*#__PURE__*/React.createElement("span", {
+    className: "minor-entry-arrow"
+  }, "➤"))))) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "browse-header"
   }, /*#__PURE__*/React.createElement("span", {
     className: "browse-eyebrow"
@@ -2738,7 +2863,7 @@ function Warhammer40KEncyclopedia() {
     className: "index-card-label"
   }, it.label), /*#__PURE__*/React.createElement("span", {
     className: "index-card-desc"
-  }, it.desc)))), /*#__PURE__*/React.createElement("div", {
+  }, it.desc))))), activeFaction.id !== "minor" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "browse-header",
     style: {
       marginTop: "28px"
@@ -2764,7 +2889,7 @@ function Warhammer40KEncyclopedia() {
     className: "browse-card-title"
   }, item.title), /*#__PURE__*/React.createElement("span", {
     className: "browse-card-arrow"
-  }, "Access ➤")))), history.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "Access ➤"))))), history.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "browse-header",
     style: {
       marginTop: "28px"
