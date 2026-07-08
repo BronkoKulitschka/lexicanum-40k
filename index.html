@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================ -->
-<!-- LEXICANUM V0.50 - VORAB UEBERSETZT (kein Babel) -->
+<!-- LEXICANUM V0.51 - VORAB UEBERSETZT (kein Babel) -->
 <!-- ============================================ -->
 <html lang="en">
   <head>
@@ -40,7 +40,7 @@ const {
  * APP VERSION — bump this whenever the app changes, so the displayed number
  * confirms the device is running the latest uploaded file. Shown under the logo.
  * ========================================================================== */
-const APP_VERSION = "v0.50";
+const APP_VERSION = "v0.51";
 
 /* ============================================================================
  * DATA SOURCES — MediaWiki community wikis (no AI, no API key, free)
@@ -945,6 +945,22 @@ const FACTION_INDEX_TYPES = {
 const PLACEHOLDER_QUERIES = ["Space Marine Chapter Master", "Necron Dynasties", "Warp and Chaos Gods", "Battle of Cadia", "Adeptus Mechanicus Technology", "Craftworld Ulthwé"];
 function Warhammer40KEncyclopedia() {
   const [activeFaction, setActiveFaction] = useState(FACTIONS[0]);
+  const [showOptions, setShowOptions] = useState(false);
+  const [options, setOptions] = useState({
+    brightness: 118,
+    // percent (60–160)
+    flicker: true,
+    // CRT flicker animation
+    scanlines: true,
+    // scanline overlay
+    fontScale: 100,
+    // percent (80–140)
+    reduceMotion: false // disable all animation/transition
+  });
+  const setOption = (key, value) => setOptions(o => ({
+    ...o,
+    [key]: value
+  }));
   const [query, setQuery] = useState("");
   const [inputFocused, setInputFocused] = useState(false);
   const [category, setCategory] = useState("All");
@@ -1183,10 +1199,11 @@ function Warhammer40KEncyclopedia() {
         radial-gradient(ellipse at 50% 40%, ${colors.glow.replace("0.4", "0.18")} 0%, transparent 75%),
         radial-gradient(ellipse at 50% 120%, ${colors.glow.replace("0.4", "0.10")} 0%, transparent 65%);
       font-family: 'Share Tech Mono', 'Source Serif 4', monospace;
+      font-size: ${options.fontScale}%;
       color: ${colors.text};
       text-shadow: 0 0 1px ${colors.glow.replace("0.4", "0.5")};
-      transition: all 0.4s ease;
-      filter: brightness(1.18) contrast(1.04);
+      transition: ${options.reduceMotion ? "none" : "all 0.4s ease"};
+      filter: brightness(${options.brightness / 100}) contrast(1.04);
     }
 
     /* CRT scanlines overlay */
@@ -1196,6 +1213,7 @@ function Warhammer40KEncyclopedia() {
       inset: 0;
       pointer-events: none;
       z-index: 9998;
+      display: ${options.scanlines ? "block" : "none"};
       background: repeating-linear-gradient(
         0deg,
         rgba(0,0,0,0) 0px,
@@ -1214,7 +1232,7 @@ function Warhammer40KEncyclopedia() {
       pointer-events: none;
       z-index: 9999;
       background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
-      animation: crtflicker 3s infinite steps(40);
+      animation: ${options.flicker && !options.reduceMotion ? "crtflicker 3s infinite steps(40)" : "none"};
     }
 
     @keyframes crtflicker {
@@ -1257,6 +1275,92 @@ function Warhammer40KEncyclopedia() {
     @media (prefers-reduced-motion: reduce) {
       .w40k-app::after { animation: none; }
       .w40k-app { animation: none; }
+    }
+    /* Manual "reduce motion" option */
+    .w40k-app.no-motion,
+    .w40k-app.no-motion * {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    /* Gear button in header */
+    .gear-btn {
+      background: transparent;
+      border: 1px solid ${colors.primary}66;
+      color: ${colors.primary};
+      font-size: 18px;
+      width: 38px; height: 38px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: ${options.reduceMotion ? "none" : "all 0.15s"};
+    }
+    .gear-btn:hover { background: ${colors.glow}; box-shadow: 0 0 10px ${colors.glow}; }
+
+    /* Options overlay + panel */
+    .options-overlay {
+      position: fixed; inset: 0; z-index: 10000;
+      background: rgba(0,0,0,0.75);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .options-panel {
+      background: ${colors.surface};
+      border: 1px solid ${colors.primary};
+      box-shadow: 0 0 30px ${colors.glow};
+      max-width: 420px; width: 100%;
+      padding: 20px;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .options-head {
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: 'Cinzel', serif; font-size: 15px; letter-spacing: 2px;
+      color: ${colors.accent};
+      border-bottom: 1px solid ${colors.primary}44;
+      padding-bottom: 12px; margin-bottom: 16px;
+    }
+    .options-close {
+      background: transparent; border: 1px solid ${colors.primary}66;
+      color: ${colors.primary}; cursor: pointer;
+      width: 30px; height: 30px; font-size: 14px;
+    }
+    .option-row { margin-bottom: 18px; }
+    .option-row label {
+      display: block; font-size: 12px; letter-spacing: 1px;
+      color: ${colors.text}; margin-bottom: 8px;
+    }
+    .option-row input[type="range"] {
+      width: 100%; accent-color: ${colors.primary};
+    }
+    .option-row.toggle {
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer;
+    }
+    .option-row.toggle label { margin-bottom: 0; cursor: pointer; }
+    .switch {
+      width: 46px; height: 24px; border-radius: 12px;
+      background: ${colors.bg}; border: 1px solid ${colors.primary}66;
+      position: relative; transition: ${options.reduceMotion ? "none" : "all 0.15s"};
+      flex-shrink: 0;
+    }
+    .switch .knob {
+      position: absolute; top: 2px; left: 2px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: ${colors.primary}88;
+      transition: ${options.reduceMotion ? "none" : "all 0.15s"};
+    }
+    .switch.on { background: ${colors.primary}; }
+    .switch.on .knob { left: 24px; background: ${colors.bg}; }
+    .options-reset {
+      width: 100%; margin-top: 8px; padding: 10px;
+      background: transparent; border: 1px solid ${colors.primary}66;
+      color: ${colors.text}; font-family: 'Cinzel', serif;
+      font-size: 11px; letter-spacing: 2px; cursor: pointer;
+    }
+    .options-reset:hover { background: ${colors.glow}; }
+    .options-note {
+      text-align: center; font-size: 10px; color: ${colors.text}77;
+      margin-top: 12px; letter-spacing: 1px;
     }
 
     .header {
@@ -2263,12 +2367,71 @@ function Warhammer40KEncyclopedia() {
     }
   `;
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("style", null, css), /*#__PURE__*/React.createElement("div", {
-    className: "w40k-app",
+    className: `w40k-app${options.reduceMotion ? " no-motion" : ""}`,
     style: {
       opacity: animating ? 0 : 1,
-      transition: "opacity 0.3s"
+      transition: options.reduceMotion ? "none" : "opacity 0.3s"
     }
-  }, /*#__PURE__*/React.createElement("header", {
+  }, showOptions && /*#__PURE__*/React.createElement("div", {
+    className: "options-overlay",
+    onClick: () => setShowOptions(false)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "options-panel",
+    onClick: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "options-head"
+  }, /*#__PURE__*/React.createElement("span", null, "⚙ OPTIONEN"), /*#__PURE__*/React.createElement("button", {
+    className: "options-close",
+    onClick: () => setShowOptions(false)
+  }, "✕")), /*#__PURE__*/React.createElement("div", {
+    className: "option-row"
+  }, /*#__PURE__*/React.createElement("label", null, "Helligkeit: ", options.brightness, "%"), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "60",
+    max: "160",
+    value: options.brightness,
+    onChange: e => setOption("brightness", Number(e.target.value))
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "option-row"
+  }, /*#__PURE__*/React.createElement("label", null, "Schriftgröße: ", options.fontScale, "%"), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "80",
+    max: "140",
+    value: options.fontScale,
+    onChange: e => setOption("fontScale", Number(e.target.value))
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "option-row toggle",
+    onClick: () => setOption("scanlines", !options.scanlines)
+  }, /*#__PURE__*/React.createElement("label", null, "Scanlines"), /*#__PURE__*/React.createElement("span", {
+    className: `switch ${options.scanlines ? "on" : ""}`
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "knob"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "option-row toggle",
+    onClick: () => setOption("flicker", !options.flicker)
+  }, /*#__PURE__*/React.createElement("label", null, "CRT-Flackern"), /*#__PURE__*/React.createElement("span", {
+    className: `switch ${options.flicker ? "on" : ""}`
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "knob"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "option-row toggle",
+    onClick: () => setOption("reduceMotion", !options.reduceMotion)
+  }, /*#__PURE__*/React.createElement("label", null, "Bewegung reduzieren"), /*#__PURE__*/React.createElement("span", {
+    className: `switch ${options.reduceMotion ? "on" : ""}`
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "knob"
+  }))), /*#__PURE__*/React.createElement("button", {
+    className: "options-reset",
+    onClick: () => setOptions({
+      brightness: 118,
+      flicker: true,
+      scanlines: true,
+      fontScale: 100,
+      reduceMotion: false
+    })
+  }, "◄ Zurücksetzen"), /*#__PURE__*/React.createElement("div", {
+    className: "options-note"
+  }, "Einstellungen gelten für diese Sitzung."))), /*#__PURE__*/React.createElement("header", {
     className: "header"
   }, /*#__PURE__*/React.createElement("div", {
     className: "header-top"
@@ -2283,6 +2446,12 @@ function Warhammer40KEncyclopedia() {
   }, "LEXICANUM 40K"), /*#__PURE__*/React.createElement("div", {
     className: "logo-sub"
   }, "ENCYCLOPAEDIA IMPERIALIS · ", APP_VERSION))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: "14px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Cinzel', serif",
       fontSize: "9px",
@@ -2299,7 +2468,12 @@ function Warhammer40KEncyclopedia() {
     style: {
       color: colors.accent
     }
-  }, activeFaction.name.toUpperCase()))), /*#__PURE__*/React.createElement("div", {
+  }, activeFaction.name.toUpperCase())), /*#__PURE__*/React.createElement("button", {
+    className: "gear-btn",
+    onClick: () => setShowOptions(true),
+    title: "Optionen",
+    "aria-label": "Optionen"
+  }, "⚙"))), /*#__PURE__*/React.createElement("div", {
     className: "faction-bar"
   }, FACTIONS.map(f => /*#__PURE__*/React.createElement("button", {
     key: f.id,
