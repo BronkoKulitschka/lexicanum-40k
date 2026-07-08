@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================ -->
-<!-- LEXICANUM V0.11 - VORAB UEBERSETZT (kein Babel) -->
+<!-- LEXICANUM V0.12 - VORAB UEBERSETZT (kein Babel) -->
 <!-- ============================================ -->
 <html lang="en">
   <head>
@@ -40,7 +40,7 @@ const {
  * APP VERSION — bump this whenever the app changes, so the displayed number
  * confirms the device is running the latest uploaded file. Shown under the logo.
  * ========================================================================== */
-const APP_VERSION = "v0.11";
+const APP_VERSION = "v0.12";
 
 /* ============================================================================
  * DATA SOURCES — MediaWiki community wikis (no AI, no API key, free)
@@ -770,10 +770,10 @@ const CATEGORY_MAP = {
   eldar: {
     personae: {
       fandom: "Category:Eldar Characters",
-      lexicanum: ""
+      lexicanum: "Category:Characters (Craftworld Eldar)"
     },
     worlds: {
-      fandom: "Category:Eldar planets",
+      fandom: "Category:Craftworlds",
       lexicanum: ""
     },
     tech: {
@@ -781,7 +781,7 @@ const CATEGORY_MAP = {
       lexicanum: ""
     },
     weapons: {
-      fandom: "Category:Eldar weapons",
+      fandom: "Category:Eldar Weapons",
       lexicanum: ""
     },
     organisations: {
@@ -789,7 +789,7 @@ const CATEGORY_MAP = {
       lexicanum: ""
     },
     battles: {
-      fandom: "Category:Eldar Campaigns",
+      fandom: "Category:Campaigns",
       lexicanum: ""
     }
   },
@@ -892,12 +892,12 @@ const IMPORTANT_MAP = {
     battles: ["Horus Heresy", "13th Black Crusade", "Siege of Terra", "Battle of Skalathrax"]
   },
   eldar: {
-    personae: ["Eldrad Ulthran", "Asurmen", "Jain Zar", "Maugan Ra", "Yvraine"],
-    worlds: ["Craftworld Ulthwé", "Craftworld Biel-Tan", "Craftworld Iyanden"],
-    tech: [],
-    weapons: ["Shuriken Catapult"],
-    organisations: ["Aspect Warriors", "Harlequins"],
-    battles: []
+    personae: ["Eldrad Ulthran", "Asurmen", "Jain Zar", "Maugan Ra", "Baharroth", "Karandras", "Fuegan", "Yvraine", "Prince Yriel", "Illic Nightspear", "Avatar of Khaine"],
+    worlds: ["Ulthwé", "Biel-Tan", "Iyanden", "Saim-Hann", "Alaitoc", "Commorragh", "Black Library"],
+    tech: ["Wraithbone", "Spirit Stone", "Webway", "Infinity Circuit", "Holo-field", "Wraithguard"],
+    weapons: ["Shuriken Catapult", "Bright Lance", "Diresword", "Death Spinner", "D-Cannon", "Fusion Gun"],
+    organisations: ["Aspect Warriors", "Harlequins", "Ynnari", "Dire Avengers", "Howling Banshees", "Striking Scorpions", "Fire Dragons"],
+    battles: ["Fall of the Aeldari", "Battle of Iyanden", "Battle of Biel-Tan"]
   },
   orks: {
     personae: ["Ghazghkull Thraka", "Mad Dok Grotsnik"],
@@ -2282,7 +2282,7 @@ function Warhammer40KEncyclopedia() {
     className: "logo-text"
   }, "LEXICANUM 40K"), /*#__PURE__*/React.createElement("div", {
     className: "logo-sub"
-  }, "ENCYCLOPAEDIA IMPERIALIS \xB7 ", APP_VERSION))), /*#__PURE__*/React.createElement("div", {
+  }, "ENCYCLOPAEDIA IMPERIALIS · ", APP_VERSION))), /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Cinzel', serif",
       fontSize: "9px",
@@ -2320,7 +2320,7 @@ function Warhammer40KEncyclopedia() {
     className: "search-section"
   }, /*#__PURE__*/React.createElement("span", {
     className: "search-label"
-  }, "\u2B1B Query the Lexicanum"), /*#__PURE__*/React.createElement("div", {
+  }, "⬛ Query the Lexicanum"), /*#__PURE__*/React.createElement("div", {
     className: "search-container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "search-input-wrap"
@@ -2337,7 +2337,7 @@ function Warhammer40KEncyclopedia() {
     placeholder: inputFocused ? "" : "AWAITING QUERY..."
   }), !query && !inputFocused && /*#__PURE__*/React.createElement("span", {
     className: "terminal-cursor"
-  }, "\u2588")), /*#__PURE__*/React.createElement("button", {
+  }, "█")), /*#__PURE__*/React.createElement("button", {
     className: "search-btn",
     onClick: () => handleSearch(),
     disabled: isLoading || !query.trim()
@@ -2373,7 +2373,7 @@ function Warhammer40KEncyclopedia() {
     className: "error-block"
   }, /*#__PURE__*/React.createElement("div", {
     className: "error-icon"
-  }, "\u2620"), /*#__PURE__*/React.createElement("div", {
+  }, "☠"), /*#__PURE__*/React.createElement("div", {
     className: "error-text"
   }, error), /*#__PURE__*/React.createElement("button", {
     className: "back-btn",
@@ -2382,7 +2382,7 @@ function Warhammer40KEncyclopedia() {
       marginBottom: 0
     },
     onClick: goHome
-  }, "\u25C4 Back to Archives")), !results && !isLoading && !error && !indexData && !indexLoading && !searchHits && /*#__PURE__*/React.createElement("div", {
+  }, "◄ Back to Archives")), !results && !isLoading && !error && !indexData && !indexLoading && !searchHits && /*#__PURE__*/React.createElement("div", {
     className: "browse-mode"
   }, /*#__PURE__*/React.createElement("div", {
     className: "welcome-block"
@@ -2392,7 +2392,7 @@ function Warhammer40KEncyclopedia() {
     className: "welcome-title"
   }, "The Lexicanum Awaits"), /*#__PURE__*/React.createElement("div", {
     className: "welcome-subtitle"
-  }, "Knowledge is Power \u2014 Guard it Well"), /*#__PURE__*/React.createElement("div", {
+  }, "Knowledge is Power — Guard it Well"), /*#__PURE__*/React.createElement("div", {
     className: "welcome-desc"
   }, "Access the sacred archives of the ", activeFaction.name, ". Search above, browse an index of all entries, or pick a curated topic below."), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2406,7 +2406,7 @@ function Warhammer40KEncyclopedia() {
     className: "browse-header"
   }, /*#__PURE__*/React.createElement("span", {
     className: "browse-eyebrow"
-  }, "\u2B1B Browse the Index"), /*#__PURE__*/React.createElement("span", {
+  }, "⬛ Browse the Index"), /*#__PURE__*/React.createElement("span", {
     className: "browse-faction-name"
   }, "All entries of the ", activeFaction.shortName)), /*#__PURE__*/React.createElement("div", {
     className: "index-grid"
@@ -2427,7 +2427,7 @@ function Warhammer40KEncyclopedia() {
     }
   }, /*#__PURE__*/React.createElement("span", {
     className: "browse-eyebrow"
-  }, "\u2B1B Featured Topics"), /*#__PURE__*/React.createElement("span", {
+  }, "⬛ Featured Topics"), /*#__PURE__*/React.createElement("span", {
     className: "browse-faction-name"
   }, activeFaction.name)), /*#__PURE__*/React.createElement("div", {
     className: "browse-grid"
@@ -2446,14 +2446,14 @@ function Warhammer40KEncyclopedia() {
     className: "browse-card-title"
   }, item.title), /*#__PURE__*/React.createElement("span", {
     className: "browse-card-arrow"
-  }, "Access \u27A4")))), history.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "Access ➤")))), history.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "browse-header",
     style: {
       marginTop: "28px"
     }
   }, /*#__PURE__*/React.createElement("span", {
     className: "browse-eyebrow"
-  }, "\u2B1B Recent Queries")), /*#__PURE__*/React.createElement("div", {
+  }, "⬛ Recent Queries")), /*#__PURE__*/React.createElement("div", {
     className: "recent-row"
   }, history.slice(0, 8).map((h, i) => /*#__PURE__*/React.createElement("button", {
     key: i,
@@ -2467,11 +2467,11 @@ function Warhammer40KEncyclopedia() {
   }, /*#__PURE__*/React.createElement("button", {
     className: "back-btn",
     onClick: goHome
-  }, "\u25C4 Back to Archives"), /*#__PURE__*/React.createElement("div", {
+  }, "◄ Back to Archives"), /*#__PURE__*/React.createElement("div", {
     className: "index-header"
   }, /*#__PURE__*/React.createElement("span", {
     className: "index-header-icon"
-  }, "\u2315"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  }, "⌕"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "index-header-title"
   }, "Search: ", searchHits.term), /*#__PURE__*/React.createElement("div", {
     className: "index-header-sub"
@@ -2509,7 +2509,7 @@ function Warhammer40KEncyclopedia() {
   }, /*#__PURE__*/React.createElement("button", {
     className: "back-btn",
     onClick: goHome
-  }, "\u25C4 Back to Archives"), /*#__PURE__*/React.createElement("div", {
+  }, "◄ Back to Archives"), /*#__PURE__*/React.createElement("div", {
     className: "index-header"
   }, /*#__PURE__*/React.createElement("span", {
     className: "index-header-icon"
@@ -2517,7 +2517,7 @@ function Warhammer40KEncyclopedia() {
     className: "index-header-title"
   }, indexData.indexTitle || activeIndexType?.label), /*#__PURE__*/React.createElement("div", {
     className: "index-header-sub"
-  }, activeFaction.name, " \u2014 ", indexData.totalCount ?? (indexData.entries?.length || 0), " entries"))), (indexData.important || indexData.entries) && /*#__PURE__*/React.createElement("input", {
+  }, activeFaction.name, " — ", indexData.totalCount ?? (indexData.entries?.length || 0), " entries"))), (indexData.important || indexData.entries) && /*#__PURE__*/React.createElement("input", {
     className: "index-filter",
     placeholder: "> FILTER ENTRIES...",
     value: indexFilter,
@@ -2530,13 +2530,13 @@ function Warhammer40KEncyclopedia() {
       className: "index-list"
     }, /*#__PURE__*/React.createElement("div", {
       className: "index-group-head important"
-    }, "\u2605 WICHTIGE"), shown.map((entry, i) => /*#__PURE__*/React.createElement("button", {
+    }, "★ WICHTIGE"), shown.map((entry, i) => /*#__PURE__*/React.createElement("button", {
       key: "imp" + i,
       className: "index-entry",
       onClick: () => openArticle(entry.name, entry.source)
     }, /*#__PURE__*/React.createElement("span", {
       className: "index-entry-num"
-    }, "\u2605"), /*#__PURE__*/React.createElement("span", {
+    }, "★"), /*#__PURE__*/React.createElement("span", {
       className: "index-entry-body"
     }, /*#__PURE__*/React.createElement("span", {
       className: "index-entry-name"
@@ -2544,7 +2544,7 @@ function Warhammer40KEncyclopedia() {
       className: "index-entry-src"
     }, entry.sources?.map(s => s.id === "lexicanum" ? "LEX" : "FAN").join(" · "))), /*#__PURE__*/React.createElement("span", {
       className: "index-entry-arrow"
-    }, "\u27A4"))));
+    }, "➤"))));
   })(), (() => {
     const f = indexFilter.trim().toLowerCase();
     const list = f ? (indexData.entries || []).filter(e => e.name.toLowerCase().includes(f)) : indexData.entries || [];
@@ -2553,7 +2553,7 @@ function Warhammer40KEncyclopedia() {
       className: "index-list"
     }, /*#__PURE__*/React.createElement("div", {
       className: "index-group-head"
-    }, "ALLE EINTR\xC4GE"), list.map((entry, i) => /*#__PURE__*/React.createElement("button", {
+    }, "ALLE EINTRÄGE"), list.map((entry, i) => /*#__PURE__*/React.createElement("button", {
       key: i,
       className: "index-entry",
       onClick: () => openArticle(entry.name, entry.source)
@@ -2569,13 +2569,13 @@ function Warhammer40KEncyclopedia() {
       className: "index-entry-src"
     }, entry.sources.map(s => s.id === "lexicanum" ? "LEX" : "FAN").join(" · ")) : null), /*#__PURE__*/React.createElement("span", {
       className: "index-entry-arrow"
-    }, "\u27A4"))));
+    }, "➤"))));
   })()), results && !isLoading && /*#__PURE__*/React.createElement("div", {
     className: "result-container"
   }, /*#__PURE__*/React.createElement("button", {
     className: "back-btn",
     onClick: goHome
-  }, "\u25C4 Back to Archives"), /*#__PURE__*/React.createElement("div", {
+  }, "◄ Back to Archives"), /*#__PURE__*/React.createElement("div", {
     className: "result-header"
   }, /*#__PURE__*/React.createElement("div", {
     className: "result-classification"
@@ -2593,20 +2593,20 @@ function Warhammer40KEncyclopedia() {
     className: "result-title"
   }, results.title), /*#__PURE__*/React.createElement("div", {
     className: "result-meta"
-  }, /*#__PURE__*/React.createElement("span", null, "\u25C8 ", results.category), /*#__PURE__*/React.createElement("span", null, "\u25C8 ", results.faction)), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("span", null, "◈ ", results.category), /*#__PURE__*/React.createElement("span", null, "◈ ", results.faction)), /*#__PURE__*/React.createElement("div", {
     className: "result-summary"
   }, renderLinkedText(results.summary)), results.sourceUrl && /*#__PURE__*/React.createElement("a", {
     className: "source-link",
     href: results.sourceUrl,
     target: "_blank",
     rel: "noopener noreferrer"
-  }, "\u25C8 Source: ", results.sourceLabel, " \u2014 read full article \u2197")), results.quote && /*#__PURE__*/React.createElement("div", {
+  }, "◈ Source: ", results.sourceLabel, " — read full article ↗")), results.quote && /*#__PURE__*/React.createElement("div", {
     className: "quote-block"
   }, /*#__PURE__*/React.createElement("div", {
     className: "quote-text"
   }, results.quote), /*#__PURE__*/React.createElement("div", {
     className: "quote-source"
-  }, "\u2014 ", results.quoteSource)), /*#__PURE__*/React.createElement("div", {
+  }, "— ", results.quoteSource)), /*#__PURE__*/React.createElement("div", {
     className: "content-grid"
   }, /*#__PURE__*/React.createElement("div", {
     className: "sections-col"
@@ -2642,7 +2642,7 @@ function Warhammer40KEncyclopedia() {
     className: "related-dot"
   }), topic))))))), /*#__PURE__*/React.createElement("footer", {
     className: "footer"
-  }, "Lexicanum 40K \u2014 ", activeFaction.name, " \u2014 For the Glory of the ", activeFaction.shortName, " \u2014 In the grim darkness of the far future, there is only war")));
+  }, "Lexicanum 40K — ", activeFaction.name, " — For the Glory of the ", activeFaction.shortName, " — In the grim darkness of the far future, there is only war")));
 }
 ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(Warhammer40KEncyclopedia, null));
     </script>
