@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================ -->
-<!-- LEXICANUM V0.13 - VORAB UEBERSETZT (kein Babel) -->
+<!-- LEXICANUM V0.50 - VORAB UEBERSETZT (kein Babel) -->
 <!-- ============================================ -->
 <html lang="en">
   <head>
@@ -40,7 +40,7 @@ const {
  * APP VERSION — bump this whenever the app changes, so the displayed number
  * confirms the device is running the latest uploaded file. Shown under the logo.
  * ========================================================================== */
-const APP_VERSION = "v0.13";
+const APP_VERSION = "v0.50";
 
 /* ============================================================================
  * DATA SOURCES — MediaWiki community wikis (no AI, no API key, free)
@@ -822,10 +822,10 @@ const CATEGORY_MAP = {
   necrons: {
     personae: {
       fandom: "Category:Necron Characters",
-      lexicanum: ""
+      lexicanum: "Category:Characters (Necron)"
     },
     worlds: {
-      fandom: "Category:Necron planets",
+      fandom: "Category:Necron Dynasty",
       lexicanum: ""
     },
     tech: {
@@ -833,7 +833,7 @@ const CATEGORY_MAP = {
       lexicanum: ""
     },
     weapons: {
-      fandom: "Category:Necron weapons",
+      fandom: "Category:Necron Weapons",
       lexicanum: ""
     },
     organisations: {
@@ -841,17 +841,17 @@ const CATEGORY_MAP = {
       lexicanum: ""
     },
     battles: {
-      fandom: "Category:Necron Campaigns",
+      fandom: "Category:Campaigns",
       lexicanum: ""
     }
   },
   tau: {
     personae: {
       fandom: "Category:Tau Characters",
-      lexicanum: ""
+      lexicanum: "Category:Characters (Tau)"
     },
     worlds: {
-      fandom: "Category:Tau planets",
+      fandom: "Category:Tau Sept",
       lexicanum: ""
     },
     tech: {
@@ -859,7 +859,7 @@ const CATEGORY_MAP = {
       lexicanum: ""
     },
     weapons: {
-      fandom: "Category:Tau weapons",
+      fandom: "Category:Tau Weapons",
       lexicanum: ""
     },
     organisations: {
@@ -867,7 +867,7 @@ const CATEGORY_MAP = {
       lexicanum: ""
     },
     battles: {
-      fandom: "Category:Tau Campaigns",
+      fandom: "Category:Campaigns",
       lexicanum: ""
     }
   }
@@ -908,20 +908,20 @@ const IMPORTANT_MAP = {
     battles: ["War of the Beast", "Second War for Armageddon", "Third War for Armageddon", "Battle of Ullanor"]
   },
   necrons: {
-    personae: ["Imotekh the Stormlord", "Trazyn the Infinite", "Orikan the Diviner", "Szarekh"],
-    worlds: ["Mandragora"],
-    tech: ["Living Metal"],
-    weapons: ["Gauss Flayer"],
-    organisations: ["Sautekh Dynasty"],
-    battles: []
+    personae: ["Imotekh the Stormlord", "Trazyn the Infinite", "Orikan the Diviner", "Szarekh", "Anrakyr the Traveller", "Nemesor Zahndrekh", "Vargard Obyron", "Illuminor Szeras", "The Silent King", "Nightbringer", "Deceiver"],
+    worlds: ["Mandragora", "Solemnace", "Gidrim", "Thanatos", "Zapennec"],
+    tech: ["Living Metal", "Necrodermis", "Tesseract Vault", "Canoptek Scarab", "Resurrection Orb", "Quantum Shielding", "Dolmen Gate"],
+    weapons: ["Gauss Flayer", "Tesla Carbine", "Staff of Light", "Warscythe", "Doomsday Cannon", "Voidblade", "Death Ray"],
+    organisations: ["Sautekh Dynasty", "Mephrit Dynasty", "Nihilakh Dynasty", "Novokh Dynasty", "Nephrekh Dynasty", "Triarch Praetorians", "C'tan"],
+    battles: ["War in Heaven", "Orphean War", "Fall of Cadia"]
   },
   tau: {
-    personae: ["Commander Farsight", "Commander Shadowsun", "Aun'Va"],
-    worlds: ["T'au", "Vior'la"],
-    tech: ["Battlesuit"],
-    weapons: ["Pulse Rifle", "Railgun"],
-    organisations: ["Fire Caste", "Ethereal Caste"],
-    battles: ["Damocles Crusade"]
+    personae: ["Commander Farsight", "Commander Shadowsun", "Aun'Va", "Aun'Shi", "Darkstrider", "Longstrike", "Commander Brightsword", "Commander Puretide", "Shas'O Kais"],
+    worlds: ["T'au", "Vior'la", "Sa'cea", "Bork'an", "Dal'yth", "Fal'shia", "Tau'n", "D'yanoi"],
+    tech: ["XV8 Crisis Battlesuit", "XV104 Riptide Battlesuit", "XV25 Stealthsuit", "Drone", "Combat Armour", "Dark Matter Nova Reactor"],
+    weapons: ["Pulse Rifle", "Railgun", "Rail Rifle", "Fusion Blaster", "Burst Cannon", "Ion Cannon", "Smart Missile System"],
+    organisations: ["Fire Caste", "Earth Caste", "Water Caste", "Air Caste", "Ethereal Caste", "Farsight Enclaves", "Kroot", "Vespid"],
+    battles: ["Damocles Gulf Crusade", "War of Dakka", "Conquest of Mu'gulath Bay", "Taros Campaign"]
   }
 };
 
