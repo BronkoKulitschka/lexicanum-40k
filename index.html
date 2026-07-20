@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================ -->
-<!-- LEXICANUM V0.55 - VORAB UEBERSETZT (kein Babel) -->
+<!-- LEXICANUM V0.56 - VORAB UEBERSETZT (kein Babel) -->
 <!-- ============================================ -->
 <html lang="en">
   <head>
@@ -40,7 +40,7 @@ const {
  * APP VERSION — bump this whenever the app changes, so the displayed number
  * confirms the device is running the latest uploaded file. Shown under the logo.
  * ========================================================================== */
-const APP_VERSION = "v0.55";
+const APP_VERSION = "v0.56";
 
 /* ============================================================================
  * ARTICLE IMAGES — automatic, unique ID from the article name.
@@ -57,10 +57,12 @@ function imageIdFor(name) {
   return h.toString(16).padStart(8, "0");
 }
 
-// Returns the up-to-3 candidate image URLs for an article name.
-function imageUrlsFor(name) {
+// Returns the candidate image sources for one article, up to 3 slots.
+// Each slot lists its filename variants in priority order (WebP first, then PNG).
+// WebP is much smaller; PNG is kept as fallback for already-made images.
+function imageSlotsFor(name) {
   const id = imageIdFor(name);
-  return [`images/${id}.png`, `images/${id}-2.png`, `images/${id}-3.png`];
+  return [[`images/${id}.webp`, `images/${id}.png`], [`images/${id}-2.webp`, `images/${id}-2.png`], [`images/${id}-3.webp`, `images/${id}-3.png`]];
 }
 
 /* ============================================================================
@@ -1379,19 +1381,20 @@ function Warhammer40KEncyclopedia() {
     });
   };
 
-  // Shows a single article image only if it actually loads (missing -> nothing).
+  // Shows one article image, trying each source variant (webp, then png).
+  // If none load, renders nothing.
   const ArticleImage = ({
-    src,
+    sources,
     alt
   }) => {
-    const [ok, setOk] = useState(true);
-    if (!ok) return null;
+    const [idx, setIdx] = useState(0);
+    if (!sources || idx >= sources.length) return null;
     return /*#__PURE__*/React.createElement("img", {
       className: "article-image",
-      src: src,
+      src: sources[idx],
       alt: alt,
       loading: "lazy",
-      onError: () => setOk(false)
+      onError: () => setIdx(n => n + 1)
     });
   };
   const css = `
@@ -3086,7 +3089,7 @@ function Warhammer40KEncyclopedia() {
   }, results.title), /*#__PURE__*/React.createElement("div", {
     className: "result-meta"
   }, /*#__PURE__*/React.createElement("span", null, "◈ ", results.category), /*#__PURE__*/React.createElement("span", null, "◈ ", results.faction)), /*#__PURE__*/React.createElement(ArticleImage, {
-    src: imageUrlsFor(results.title)[0],
+    sources: imageSlotsFor(results.title)[0],
     alt: results.title
   }), /*#__PURE__*/React.createElement("div", {
     className: "result-summary"
@@ -3114,10 +3117,10 @@ function Warhammer40KEncyclopedia() {
   }, section.heading), /*#__PURE__*/React.createElement("div", {
     className: "section-content"
   }, renderLinkedText(section.content))), i === 0 && /*#__PURE__*/React.createElement(ArticleImage, {
-    src: imageUrlsFor(results.title)[1],
+    sources: imageSlotsFor(results.title)[1],
     alt: results.title
   }), i === 1 && /*#__PURE__*/React.createElement(ArticleImage, {
-    src: imageUrlsFor(results.title)[2],
+    sources: imageSlotsFor(results.title)[2],
     alt: results.title
   })))), /*#__PURE__*/React.createElement("div", {
     className: "sidebar-col"
