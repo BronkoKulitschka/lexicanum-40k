@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================ -->
-<!-- LEXICANUM V0.54 - VORAB UEBERSETZT (kein Babel) -->
+<!-- LEXICANUM V0.55 - VORAB UEBERSETZT (kein Babel) -->
 <!-- ============================================ -->
 <html lang="en">
   <head>
@@ -40,7 +40,28 @@ const {
  * APP VERSION — bump this whenever the app changes, so the displayed number
  * confirms the device is running the latest uploaded file. Shown under the logo.
  * ========================================================================== */
-const APP_VERSION = "v0.54";
+const APP_VERSION = "v0.55";
+
+/* ============================================================================
+ * ARTICLE IMAGES — automatic, unique ID from the article name.
+ * Same djb2 hash as used to generate the prompt PDF, so the IDs match exactly.
+ * Images live in ./images/ named [ID].png (main), [ID]-2.png, [ID]-3.png.
+ * Up to 3 per article. Missing images simply don't render.
+ * ========================================================================== */
+function imageIdFor(name) {
+  const s = String(name || "").trim().toLowerCase();
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) {
+    h = h * 33 + s.charCodeAt(i) >>> 0;
+  }
+  return h.toString(16).padStart(8, "0");
+}
+
+// Returns the up-to-3 candidate image URLs for an article name.
+function imageUrlsFor(name) {
+  const id = imageIdFor(name);
+  return [`images/${id}.png`, `images/${id}-2.png`, `images/${id}-3.png`];
+}
 
 /* ============================================================================
  * DATA SOURCES — MediaWiki community wikis (no AI, no API key, free)
@@ -1357,8 +1378,36 @@ function Warhammer40KEncyclopedia() {
       return part;
     });
   };
+
+  // Shows a single article image only if it actually loads (missing -> nothing).
+  const ArticleImage = ({
+    src,
+    alt
+  }) => {
+    const [ok, setOk] = useState(true);
+    if (!ok) return null;
+    return /*#__PURE__*/React.createElement("img", {
+      className: "article-image",
+      src: src,
+      alt: alt,
+      loading: "lazy",
+      onError: () => setOk(false)
+    });
+  };
   const css = `
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    .article-image {
+      display: block;
+      width: 100%;
+      max-width: 640px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      margin: 16px 0;
+      border: 1px solid ${colors.primary}66;
+      box-shadow: 0 0 18px ${colors.glow};
+      background: ${colors.surface};
+    }
     
     .w40k-app {
       min-height: 100vh;
@@ -3036,7 +3085,10 @@ function Warhammer40KEncyclopedia() {
     className: "result-title"
   }, results.title), /*#__PURE__*/React.createElement("div", {
     className: "result-meta"
-  }, /*#__PURE__*/React.createElement("span", null, "◈ ", results.category), /*#__PURE__*/React.createElement("span", null, "◈ ", results.faction)), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("span", null, "◈ ", results.category), /*#__PURE__*/React.createElement("span", null, "◈ ", results.faction)), /*#__PURE__*/React.createElement(ArticleImage, {
+    src: imageUrlsFor(results.title)[0],
+    alt: results.title
+  }), /*#__PURE__*/React.createElement("div", {
     className: "result-summary"
   }, renderLinkedText(results.summary)), results.sourceUrl && /*#__PURE__*/React.createElement("a", {
     className: "source-link",
@@ -3054,13 +3106,20 @@ function Warhammer40KEncyclopedia() {
   }, /*#__PURE__*/React.createElement("div", {
     className: "sections-col"
   }, results.sections?.map((section, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
+    key: i
+  }, /*#__PURE__*/React.createElement("div", {
     className: "section-block"
   }, /*#__PURE__*/React.createElement("div", {
     className: "section-heading"
   }, section.heading), /*#__PURE__*/React.createElement("div", {
     className: "section-content"
-  }, renderLinkedText(section.content))))), /*#__PURE__*/React.createElement("div", {
+  }, renderLinkedText(section.content))), i === 0 && /*#__PURE__*/React.createElement(ArticleImage, {
+    src: imageUrlsFor(results.title)[1],
+    alt: results.title
+  }), i === 1 && /*#__PURE__*/React.createElement(ArticleImage, {
+    src: imageUrlsFor(results.title)[2],
+    alt: results.title
+  })))), /*#__PURE__*/React.createElement("div", {
     className: "sidebar-col"
   }, results.keyFacts?.length > 0 && /*#__PURE__*/React.createElement("div", {
     className: "keyfacts-block"
