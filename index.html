@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================ -->
-<!-- LEXICANUM V0.56 - VORAB UEBERSETZT (kein Babel) -->
+<!-- LEXICANUM V0.57 - VORAB UEBERSETZT (kein Babel) -->
 <!-- ============================================ -->
 <html lang="en">
   <head>
@@ -40,7 +40,7 @@ const {
  * APP VERSION — bump this whenever the app changes, so the displayed number
  * confirms the device is running the latest uploaded file. Shown under the logo.
  * ========================================================================== */
-const APP_VERSION = "v0.56";
+const APP_VERSION = "v0.57";
 
 /* ============================================================================
  * ARTICLE IMAGES — automatic, unique ID from the article name.
@@ -1115,6 +1115,128 @@ const MINOR_FACTIONS = [{
   blurb: "Mysterious and dangerous Warp-touched xenos entities."
 }];
 
+/* ============================================================================
+ * TIMELINE — a curated chronology of the whole 40K history, from the ancient
+ * War in Heaven to the current Era Indomitus (M42). Each event has an era tag,
+ * a date, a title, a short blurb, and an "article" title so a tap opens the
+ * matching wiki article. Ordered oldest → newest.
+ * ========================================================================== */
+const TIMELINE = [{
+  date: "~60 Mio. v.M2",
+  era: "War in Heaven",
+  title: "Krieg im Himmel",
+  article: "War in Heaven",
+  blurb: "Die Alten und die Necrontyr führen den ersten großen Krieg der Galaxis. Die Necrontyr werden durch die Biotransferenz zu den seelenlosen Necrons."
+}, {
+  date: "~M1–M15",
+  era: "Aeldari",
+  title: "Aufstieg & Fall der Aeldari",
+  article: "Fall of the Aeldari",
+  blurb: "Das Aeldari-Reich beherrscht die Galaxis, verfällt aber in Dekadenz — was schließlich zur Geburt Slaaneshs führt."
+}, {
+  date: "~M15",
+  era: "Untergang",
+  title: "Der Fall / Geburt Slaaneshs",
+  article: "Fall of the Aeldari",
+  blurb: "Die exzessive Dekadenz der Aeldari gebiert den Chaosgott Slaanesh. Das Auge des Schreckens entsteht, die Aeldari werden fast ausgelöscht."
+}, {
+  date: "~M15–M25",
+  era: "Dark Age of Technology",
+  title: "Dunkles Zeitalter der Technologie",
+  article: "Dark Age of Technology",
+  blurb: "Die Menschheit erreicht ihren technologischen Höhepunkt, breitet sich über die Sterne aus und entwickelt Künstliche Intelligenz."
+}, {
+  date: "~M25–M30",
+  era: "Age of Strife",
+  title: "Zeitalter des Zwists (Old Night)",
+  article: "Age of Strife",
+  blurb: "Warpstürme schneiden die Menschheitswelten voneinander ab. Aufkommende Psioniker und die Männer aus Eisen stürzen die Menschheit ins Chaos."
+}, {
+  date: "~M30",
+  era: "Unification",
+  title: "Einigungskriege",
+  article: "Unification Wars",
+  blurb: "Der Imperator einigt Terra, unterwirft die Techno-Barbaren und beginnt den Aufbau des Imperiums der Menschheit."
+}, {
+  date: "~M30–M31",
+  era: "Great Crusade",
+  title: "Der Große Kreuzzug",
+  article: "Great Crusade",
+  blurb: "Der Imperator und seine Primarchen mit ihren Legionen erobern die Galaxis zurück, um die Menschheit unter einem Banner zu vereinen."
+}, {
+  date: "~M31",
+  era: "Horus Heresy",
+  title: "Die Horus-Häresie",
+  article: "Horus Heresy",
+  blurb: "Warmaster Horus fällt dem Chaos anheim. Der galaxisweite Bürgerkrieg spaltet die Legionen und gipfelt in der Belagerung von Terra."
+}, {
+  date: "~M31",
+  era: "Horus Heresy",
+  title: "Belagerung von Terra",
+  article: "Siege of Terra",
+  blurb: "Der Höhepunkt der Häresie: Horus wird erschlagen, der Imperator wird tödlich verwundet und auf dem Goldenen Thron beigesetzt."
+}, {
+  date: "544.M32",
+  era: "Age of Imperium",
+  title: "Der Krieg der Bestie",
+  article: "The Beheading",
+  blurb: "Ein gewaltiger Ork-Waaagh! bedroht Terra selbst. Die Imperial Fists werden fast ausgelöscht, die Deathwatch entsteht."
+}, {
+  date: "M36",
+  era: "Age of Apostasy",
+  title: "Zeitalter der Apostasie",
+  article: "Age of Apostasy",
+  blurb: "Der wahnsinnige Hohelord Goge Vandire reißt die Macht an sich. Sein Terror-Regime endet erst durch die Reformation der Ekklesiarchie."
+}, {
+  date: "M41",
+  era: "Time of Ending",
+  title: "Die Tyrannidenkriege",
+  article: "Tyrannic Wars",
+  blurb: "Die Schwarmflotten der Tyraniden dringen aus der intergalaktischen Leere ein und verschlingen ganze Welten."
+}, {
+  date: "M41",
+  era: "Time of Ending",
+  title: "Kriege um Armageddon",
+  article: "War for Armageddon",
+  blurb: "Ghazghkull Thraka entfesselt wiederholt gewaltige Ork-Invasionen auf der Industriewelt Armageddon."
+}, {
+  date: "999.M41",
+  era: "Time of Ending",
+  title: "13. Schwarzer Kreuzzug & Fall von Cadia",
+  article: "13th Black Crusade",
+  blurb: "Abaddon der Plünderer stürmt Cadia. Die Zerstörung der Welt löst den Großen Riss aus, der die Galaxis zerteilt."
+}, {
+  date: "999.M41",
+  era: "Great Rift",
+  title: "Der Große Riss (Cicatrix Maledictum)",
+  article: "Great Rift",
+  blurb: "Ein gewaltiger Warp-Riss durchtrennt die Galaxis von Pol zu Pol und stürzt zahllose Welten in Finsternis."
+}, {
+  date: "~M42",
+  era: "Era Indomitus",
+  title: "Rückkehr Guillimans & Indomitus-Kreuzzug",
+  article: "Indomitus Crusade",
+  blurb: "Roboute Guilliman erwacht, führt die neuen Primaris-Space-Marines an und startet den größten Kreuzzug seit dem Großen Kreuzzug."
+}, {
+  date: "~M42",
+  era: "Era Indomitus",
+  title: "Das Psychische Erwachen",
+  article: "Psychic Awakening",
+  blurb: "Der Große Riss verstärkt psychische Kräfte in der ganzen Galaxis und weckt uralte Mächte in allen Fraktionen."
+}, {
+  date: "~M42",
+  era: "Era Indomitus",
+  title: "Die Seuchenkriege",
+  article: "Plague Wars",
+  blurb: "Mortarion und seine Death Guard entfesseln Nurgles Seuchen über Guillimans Heimatreich Ultramar."
+}, {
+  date: "~M42",
+  era: "Era Indomitus",
+  title: "Vierter Tyrannidenkrieg",
+  article: "Fourth Tyrannic War",
+  blurb: "Die bislang größte Tyranniden-Invasion trifft auf ein durch den Großen Riss geteiltes, geschwächtes Imperium."
+}];
+
 // Index types that only make sense for certain factions, keyed by faction id.
 const FACTION_INDEX_TYPES = {
   imperium: [{
@@ -1137,6 +1259,7 @@ function Warhammer40KEncyclopedia() {
   const [activeFaction, setActiveFaction] = useState(FACTIONS[0]);
   const [showOptions, setShowOptions] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
   const [options, setOptions] = useState({
     brightness: 118,
     // percent (60–160)
@@ -1611,6 +1734,46 @@ function Warhammer40KEncyclopedia() {
       margin-top: 20px; padding-top: 14px;
       border-top: 1px solid ${colors.primary}33;
     }
+
+    /* Timeline */
+    .timeline-intro {
+      font-family: 'Source Serif 4', serif; font-size: 12px;
+      color: ${colors.text}bb; line-height: 1.6; margin-bottom: 18px;
+    }
+    .timeline {
+      position: relative;
+      padding-left: 22px;
+      border-left: 2px solid ${colors.primary}44;
+    }
+    .tl-event {
+      display: block; width: 100%; text-align: left;
+      position: relative;
+      background: transparent; border: none; cursor: pointer;
+      padding: 0 0 22px 8px;
+    }
+    .tl-dot {
+      position: absolute; left: -31px; top: 3px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: ${colors.primary};
+      box-shadow: 0 0 10px ${colors.glow};
+      border: 2px solid ${colors.bg};
+    }
+    .tl-body { display: block; }
+    .tl-date {
+      display: block; font-family: 'Share Tech Mono', monospace;
+      font-size: 10px; letter-spacing: 1px; color: ${colors.primary};
+      text-transform: uppercase; margin-bottom: 3px;
+    }
+    .tl-title {
+      display: block; font-family: 'Cinzel', serif; font-size: 15px;
+      color: ${colors.accent}; margin-bottom: 4px;
+    }
+    .tl-blurb {
+      display: block; font-family: 'Source Serif 4', serif;
+      font-size: 12px; line-height: 1.55; color: ${colors.text}cc;
+    }
+    .tl-event:hover .tl-title { text-shadow: 0 0 8px ${colors.glow}; }
+    .tl-event:hover .tl-dot { background: ${colors.accent}; }
 
     .header {
       border-bottom: 2px solid ${colors.border};
@@ -2646,7 +2809,39 @@ function Warhammer40KEncyclopedia() {
       opacity: animating ? 0 : 1,
       transition: options.reduceMotion ? "none" : "opacity 0.3s"
     }
-  }, showInfo && /*#__PURE__*/React.createElement("div", {
+  }, showTimeline && /*#__PURE__*/React.createElement("div", {
+    className: "options-overlay",
+    onClick: () => setShowTimeline(false)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "options-panel timeline-panel",
+    onClick: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "options-head"
+  }, /*#__PURE__*/React.createElement("span", null, "⧗ ZEITLEISTE"), /*#__PURE__*/React.createElement("button", {
+    className: "options-close",
+    onClick: () => setShowTimeline(false)
+  }, "✕")), /*#__PURE__*/React.createElement("div", {
+    className: "timeline-intro"
+  }, "Die Geschichte der Galaxis — vom Krieg im Himmel bis zur Ära Indomitus. Tippe ein Ereignis an, um den vollständigen Artikel zu öffnen."), /*#__PURE__*/React.createElement("div", {
+    className: "timeline"
+  }, TIMELINE.map((ev, i) => /*#__PURE__*/React.createElement("button", {
+    key: i,
+    className: "tl-event",
+    onClick: () => {
+      setShowTimeline(false);
+      openArticle(ev.article);
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "tl-dot"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "tl-body"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "tl-date"
+  }, ev.date, " · ", ev.era), /*#__PURE__*/React.createElement("span", {
+    className: "tl-title"
+  }, ev.title), /*#__PURE__*/React.createElement("span", {
+    className: "tl-blurb"
+  }, ev.blurb))))))), showInfo && /*#__PURE__*/React.createElement("div", {
     className: "options-overlay",
     onClick: () => setShowInfo(false)
   }, /*#__PURE__*/React.createElement("div", {
@@ -2661,7 +2856,7 @@ function Warhammer40KEncyclopedia() {
     className: "info-body"
   }, /*#__PURE__*/React.createElement("h3", null, "Lexicanum 40K"), /*#__PURE__*/React.createElement("p", {
     className: "info-ver"
-  }, "Version ", APP_VERSION, " · Prototyp"), /*#__PURE__*/React.createElement("p", null, "Eine Enzyklopädie für das Warhammer-40.000-Universum. Alle Inhalte werden live aus den Community-Wikis geladen."), /*#__PURE__*/React.createElement("h4", null, "◆ Fraktionen"), /*#__PURE__*/React.createElement("p", null, "Oben wählst du eine der sechs Fraktionen: Imperium, Chaos, Aeldari, Orks, Necrons und T'au. Jede hat ihr eigenes Farbschema und eigene Archive."), /*#__PURE__*/React.createElement("h4", null, "◆ Suche"), /*#__PURE__*/React.createElement("p", null, "Über das Suchfeld findest du Artikel aus beiden Wikis. Tippe einen Begriff ein und wähle aus den Treffern."), /*#__PURE__*/React.createElement("h4", null, "◆ Index-Übersichten"), /*#__PURE__*/React.createElement("p", null, "Jede Fraktion hat sechs Kategorien: Personen, Welten & Orte, Technologie, Waffen, Organisationen und Schlachten. Ein Tipp darauf lädt die vollständige Liste aus dem Wiki."), /*#__PURE__*/React.createElement("p", null, "Ganz oben stehen im Block ", /*#__PURE__*/React.createElement("b", null, "★ WICHTIGE"), " die zentralen Einträge. Darunter folgt die vollständige alphabetische Liste. Mit dem Filterfeld suchst du schnell in langen Listen."), /*#__PURE__*/React.createElement("h4", null, "◆ Artikel"), /*#__PURE__*/React.createElement("p", null, "Ein Tipp auf einen Eintrag öffnet den Artikeltext. Querverweise im Text sind anklickbar und führen zu verwandten Einträgen. Jeder Artikel nennt seine Quelle mit Link zum Original-Wiki."), /*#__PURE__*/React.createElement("h4", null, "◆ Optionen ⚙"), /*#__PURE__*/React.createElement("p", null, "Über das Zahnrad stellst du Helligkeit, Schriftgröße und die CRT-Effekte (Scanlines, Flackern) ein oder reduzierst Bewegung."), /*#__PURE__*/React.createElement("h4", null, "◆ Quellen"), /*#__PURE__*/React.createElement("p", null, "Inhalte stammen vom Warhammer-40k-Fandom-Wiki und von Lexicanum. Alle Namen, Bilder und Inhalte sind Eigentum von Games Workshop bzw. der jeweiligen Wikis (CC-BY-SA). Diese App ist ein inoffizielles, nicht-kommerzielles Fan-Projekt."), /*#__PURE__*/React.createElement("p", {
+  }, "Version ", APP_VERSION, " · Prototyp"), /*#__PURE__*/React.createElement("p", null, "Eine Enzyklopädie für das Warhammer-40.000-Universum. Alle Inhalte werden live aus den Community-Wikis geladen."), /*#__PURE__*/React.createElement("h4", null, "◆ Fraktionen"), /*#__PURE__*/React.createElement("p", null, "Oben wählst du eine der sechs Fraktionen: Imperium, Chaos, Aeldari, Orks, Necrons und T'au. Jede hat ihr eigenes Farbschema und eigene Archive."), /*#__PURE__*/React.createElement("h4", null, "◆ Suche"), /*#__PURE__*/React.createElement("p", null, "Über das Suchfeld findest du Artikel aus beiden Wikis. Tippe einen Begriff ein und wähle aus den Treffern."), /*#__PURE__*/React.createElement("h4", null, "◆ Index-Übersichten"), /*#__PURE__*/React.createElement("p", null, "Jede Fraktion hat sechs Kategorien: Personen, Welten & Orte, Technologie, Waffen, Organisationen und Schlachten. Ein Tipp darauf lädt die vollständige Liste aus dem Wiki."), /*#__PURE__*/React.createElement("p", null, "Ganz oben stehen im Block ", /*#__PURE__*/React.createElement("b", null, "★ WICHTIGE"), " die zentralen Einträge. Darunter folgt die vollständige alphabetische Liste. Mit dem Filterfeld suchst du schnell in langen Listen."), /*#__PURE__*/React.createElement("h4", null, "◆ Artikel"), /*#__PURE__*/React.createElement("p", null, "Ein Tipp auf einen Eintrag öffnet den Artikeltext. Querverweise im Text sind anklickbar und führen zu verwandten Einträgen. Jeder Artikel nennt seine Quelle mit Link zum Original-Wiki."), /*#__PURE__*/React.createElement("h4", null, "◆ Zeitleiste ⧗"), /*#__PURE__*/React.createElement("p", null, "Über das Sanduhr-Symbol öffnest du die Chronik der Galaxis — von der Frühzeit bis zur aktuellen Ära. Ein Tipp auf ein Ereignis öffnet den vollständigen Artikel."), /*#__PURE__*/React.createElement("h4", null, "◆ Optionen ⚙"), /*#__PURE__*/React.createElement("p", null, "Über das Zahnrad stellst du Helligkeit, Schriftgröße und die CRT-Effekte (Scanlines, Flackern) ein oder reduzierst Bewegung."), /*#__PURE__*/React.createElement("h4", null, "◆ Quellen"), /*#__PURE__*/React.createElement("p", null, "Inhalte stammen vom Warhammer-40k-Fandom-Wiki und von Lexicanum. Alle Namen, Bilder und Inhalte sind Eigentum von Games Workshop bzw. der jeweiligen Wikis (CC-BY-SA). Diese App ist ein inoffizielles, nicht-kommerzielles Fan-Projekt."), /*#__PURE__*/React.createElement("p", {
     className: "info-foot"
   }, "✠ Wissen ist Macht — bewahre es gut ✠")))), showOptions && /*#__PURE__*/React.createElement("div", {
     className: "options-overlay",
@@ -2760,6 +2955,11 @@ function Warhammer40KEncyclopedia() {
       color: colors.accent
     }
   }, activeFaction.name.toUpperCase())), /*#__PURE__*/React.createElement("button", {
+    className: "gear-btn",
+    onClick: () => setShowTimeline(true),
+    title: "Zeitleiste",
+    "aria-label": "Zeitleiste"
+  }, "⧗"), /*#__PURE__*/React.createElement("button", {
     className: "gear-btn",
     onClick: () => setShowInfo(true),
     title: "Info & Handbuch",
